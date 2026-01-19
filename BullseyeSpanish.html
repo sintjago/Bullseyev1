@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Centro del Blanco</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    #leftPanel { max-width: 900px; }
+    h1 { text-align: left; margin-left: 60px; }
+    #description {
+      max-width: 800px;
+      margin: 0 auto 15px auto;
+      font-size: 16px;
+      text-align: left;
+      padding-left: 60px;
+    }
+    #wordDisplay {
+      font-size: 24px;
+      letter-spacing: 10px;
+      margin: 10px 0 10px 60px;
+      text-align: left;
+    }
+    .slider-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-left: 60px;
+    }
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 10px 0 10px 60px;
+    }
+    .radio-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #usedLetters {
+      margin: 10px 0 0 60px;
+      font-size: 16px;
+      text-align: left;
+    }
+    .used-letter {
+      display: inline-block;
+      margin: 3px;
+      padding: 4px 8px;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .used-letter:hover { background-color: #ccc; }
+    #guessSection {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: 60px;
+    }
+    #letterInput { width: 50px; text-align: center; }
+    #customWords, #exampleLists {
+      margin-top: 10px;
+      font-size: 14px;
+      max-width: 800px;
+      text-align: left;
+      padding-left: 60px;
+    }
+    .custom-input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    #customListInput {
+      width: 280px;
+      max-width: 60%;
+      padding: 4px;
+      font-size: 14px;
+    }
+    button {
+      font-size: 14px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+    #exampleLists p {
+      margin: 5px 0;
+      white-space: nowrap;
+    }
+    #livesTracker {
+      display: flex;
+      justify-content: flex-start;
+      gap: 6px;
+      margin-top: 5px;
+    }
+    .life {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background-color: white;
+      border: 2px solid red;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+    .life.lost {
+      background-color: red;
+      transform: scale(1.1);
+    }
+    #wordListDisplay {
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      font-size: 14px;
+      height: 240px;
+      overflow-y: auto;
+      background: #f9f9f9;
+    }
+    #wordListDisplay a {
+      font-size: 13px;
+      color: #0077cc;
+      text-decoration: none;
+      margin-left: 4px;
+    }
+    #wordListDisplay a:hover { text-decoration: underline; }
+    .list-buttons {
+      display: flex;
+      gap: 6px;
+    }
+    .list-buttons button {
+      font-size: 14px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+    #foundWords {
+      margin-top: 10px;
+      font-size: 14px;
+      padding-left: 60px;
+    }
+    #foundWords span {
+      display: inline-block;
+      margin-right: 8px;
+      margin-top: 5px;
+      background-color: #e6ffe6;
+      padding: 4px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #scoreBoard {
+      margin: 10px 0 0 60px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="leftPanel">
+  <h1>Centro del Blanco</h1>
+  <p id="description">
+    Una versión de Ahorcado sin horca. Elige tus vidas (Usualmente en el ahorcado tienes 6).<br>
+    En modo 2 jugadores, uno escribe la palabra para que el otro la adivine.
+  </p>
+
+  <div class="top-controls">
+    <div class="radio-group">
+      <label><strong>Jugadores:</strong></label>
+      <label><input type="radio" name="players" value="1" id="radio1" checked onclick="setPlayers(1)"> 1</label>
+      <label><input type="radio" name="players" value="2" id="radio2" onclick="setPlayers(2)"> 2</label>
+    </div>
+    <button id="startBtn" onclick="handleStart()">Iniciar Juego</button>
+    <button onclick="fullReset()">Reset</button>
+  </div>
+  <div class="slider-container">
+    <span>Respuestas incorrectas permitidas: <span id="wrongAnswersCount">6</span></span>
+    <input type="range" id="wrongAnswersSlider" min="1" max="10" value="6">
+    <div id="livesTracker"></div>
+  </div>
+
+  <div id="twoPlayerInput" style="display: none; margin-left: 60px;">
+    <p id="playerPrompt">Jugador 1: Ingresa una palabra o lista:</p>
+    <input type="text" id="player1Word" placeholder="Ej: gato, perro, caballo" style="width: 300px;">
+    <button onclick="submitPlayer1Word()">Enviar</button>
+  </div>
+
+  <div id="scoreBoard">
+    <div><strong>Puntos Jugador 1:</strong> <span id="score1"></span></div>
+    <div><strong>Puntos Jugador 2:</strong> <span id="score2"></span></div>
+  </div>
+
+  <div style="display: flex; align-items: flex-start; gap: 60px; margin-left: 60px; margin-top: 20px;">
+    <div style="margin-top: 40px;">
+      <canvas id="bullseye" width="300" height="300"></canvas>
+    </div>
+    <div style="width: 250px;">
+      <div class="list-buttons">
+        <button onclick="toggleWordList()">Mostrar lista de palabras</button>
+        <button onclick="toggleSort()">🔃</button>
+      </div>
+      <div id="wordListDisplay" style="display: none;"></div>
+    </div>
+  </div>
+
+  <p id="wordDisplay"></p>
+
+  <div id="guessSection" style="display: none;">
+    <input type="text" id="letterInput" maxlength="1" placeholder="A">
+    <button onclick="guessLetter()">Adivinar</button>
+  </div>
+
+  <div id="usedLetters"></div>
+
+  <div id="customWords">
+    <div class="custom-input-row">
+      <strong>Lista personalizada (separada por comas):</strong>
+      <input type="text" id="customListInput" placeholder="Ej: casa, gato" />
+      <button onclick="loadCustomWords()">Usar esta lista</button>
+    </div>
+  </div>
+
+  <div id="exampleLists">
+    <p><strong>Ejemplo 1:</strong> casa, mesa, silla, puerta, ventana, cocina, baño, jardín, espejo, cuadro, lámpara, reloj</p>
+    <p><strong>Ejemplo 2:</strong> gato, perro, conejo, caballo, vaca, oveja, cerdo, pato, ratón, león, cebra, jirafa</p>
+  </div>
+
+  <div id="foundWords"><strong>Palabras adivinadas:</strong> <span id="foundList"></span></div>
+</div>
+
+<script>
+let wordList = [
+  'casa','mesa','silla','puerta','ventana','cocina','baño','jardín','espejo','cuadro',
+  'lámpara','reloj','gato','perro','conejo','caballo','vaca','oveja','cerdo','pato',
+  'ratón','león','cebra','jirafa'
+];
+
+let currentWord = "", guessedLetters = [], wrongGuesses = 0, maxWrongGuesses = 6;
+let correctWords = [], score1 = 0, score2 = 0;
+let numPlayers = 1, currentGuesser = 2, playerModeLocked = false;
+let sortAscending = true;
+let synth = window.speechSynthesis;
+
+document.getElementById("wrongAnswersSlider").addEventListener("input", function () {
+  maxWrongGuesses = parseInt(this.value);
+  document.getElementById("wrongAnswersCount").innerText = this.value;
+  drawLives();
+});
+
+function setPlayers(num) {
+  if (playerModeLocked) return;
+  numPlayers = num;
+  if (num === 2) {
+    playerModeLocked = true;
+    document.getElementById("radio1").disabled = true;
+    document.getElementById("radio2").disabled = true;
+    document.getElementById("startBtn").disabled = true;
+    document.getElementById("twoPlayerInput").style.display = "block";
+    updatePlayerPrompt();
+  }
+}
+
+function updatePlayerPrompt() {
+  const prompt = document.getElementById("playerPrompt");
+  prompt.textContent = `Jugador ${currentGuesser === 2 ? 1 : 2}: Ingresa una palabra o lista:`;
+}
+
+function submitPlayer1Word() {
+  const inputField = document.getElementById("player1Word");
+  const input = inputField.value.trim();
+  if (input) {
+    const words = input.split(",").map(w => w.trim()).filter(w => w.length > 0 && !w.includes(" "));
+    if (words.length > 0) {
+      wordList = words;
+      inputField.value = "";
+      document.getElementById("twoPlayerInput").style.display = "none";
+      startGame();
+    }
+  }
+}
+
+function handleStart() {
+  if (numPlayers === 1) {
+    startGame();
+  }
+}
+
+function startGame() {
+  guessedLetters = [];
+  wrongGuesses = 0;
+  clearBullseye();
+  drawLives();
+  const randomWord = wordList[Math.floor(Math.random() * wordList.length)];
+  currentWord = normalizeWord(randomWord);
+  document.getElementById("guessSection").style.display = "flex";
+  displayWord();
+  updateUsedLettersDisplay();
+  speakText("El juego ha comenzado");
+}
+
+function guessLetter() {
+  const input = document.getElementById("letterInput");
+  const guess = normalizeWord(input.value.trim());
+  input.value = "";
+  if (!guess || guessedLetters.includes(guess)) return;
+  guessedLetters.push(guess);
+  speakText(guess);
+  updateUsedLettersDisplay();
+  if (!currentWord.includes(guess)) {
+    wrongGuesses++;
+    animateBullseye();
+    drawBullseye(wrongGuesses);
+    drawLives();
+  }
+  if (wrongGuesses >= maxWrongGuesses) {
+    drawBullseye(maxWrongGuesses);
+    alert(`¡Juego terminado! La palabra era: ${currentWord}\n¡Buen trabajo! Adivinaste ${correctWords.length} palabra(s).`);
+    speakText(`Juego terminado. La palabra era: ${currentWord}`);
+    endRound();
+  } else {
+    displayWord();
+  }
+}
+
+function displayWord() {
+  const wordDisplay = document.getElementById("wordDisplay");
+  const display = currentWord.split("").map(letter =>
+    guessedLetters.includes(letter) || letter === ' ' ? letter : "_").join(" ");
+  wordDisplay.innerText = display;
+  if (!display.includes("_")) {
+    correctWords.push(currentWord);
+    updateFoundWords();
+    if (numPlayers === 2) {
+      if (currentGuesser === 1) score1++;
+      else score2++;
+      updateScores();
+    }
+    endRound();
+  }
+}
+
+function endRound() {
+  document.getElementById("guessSection").style.display = "none";
+  if (numPlayers === 2) {
+    currentGuesser = currentGuesser === 1 ? 2 : 1;
+    updatePlayerPrompt();
+    document.getElementById("twoPlayerInput").style.display = "block";
+  }
+}
+
+function updateUsedLettersDisplay() {
+  const container = document.getElementById("usedLetters");
+  container.innerHTML = "<strong>Letras usadas:</strong> " + guessedLetters.map(letter =>
+    `<span class="used-letter" onclick="speakText('${letter}')">${letter}</span>`).join("");
+}
+
+function updateFoundWords() {
+  const container = document.getElementById("foundList");
+  container.innerHTML = correctWords.map(w => `<span onclick="speakText('${w}')">${w}</span>`).join(" ");
+}
+
+function updateScores() {
+  document.getElementById("score1").innerText = "✔️".repeat(score1);
+  document.getElementById("score2").innerText = "✔️".repeat(score2);
+}
+
+function normalizeWord(word) {
+  return word.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+}
+
+function speakText(text) {
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'es-ES';
+  synth.cancel();
+  setTimeout(() => synth.speak(utterance), 100);
+}
+
+function clearBullseye() {
+  const canvas = document.getElementById("bullseye");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawBullseye(stage) {
+  const canvas = document.getElementById("bullseye");
+  const ctx = canvas.getContext("2d");
+  const colors = ["#ff0000", "#ffffff"];
+  const center = canvas.width / 2;
+  const radiusStep = center / maxWrongGuesses;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < stage; i++) {
+    const radius = center - i * radiusStep;
+    ctx.beginPath();
+    ctx.arc(center, center, radius, 0, 2 * Math.PI);
+    ctx.fillStyle = colors[i % 2];
+    ctx.fill();
+    ctx.closePath();
+  }
+}
+
+function drawLives() {
+  const tracker = document.getElementById("livesTracker");
+  tracker.innerHTML = '';
+  for (let i = 0; i < maxWrongGuesses; i++) {
+    const div = document.createElement("div");
+    div.className = "life" + (i < wrongGuesses ? " lost" : "");
+    tracker.appendChild(div);
+  }
+}
+
+function animateBullseye() {
+  const canvas = document.getElementById("bullseye");
+  canvas.style.transform = "scale(1.03)";
+  setTimeout(() => { canvas.style.transform = "scale(1)"; }, 150);
+}
+
+function loadCustomWords() {
+  const input = document.getElementById("customListInput").value;
+  if (input.trim()) {
+    const custom = input.split(",").map(w => w.trim()).filter(w => w.length > 0 && !w.includes(" "));
+    if (custom.length > 0) {
+      wordList = custom;
+      renderWordList();
+      correctWords = [];
+      updateFoundWords();
+      startGame();
+      alert("Lista personalizada cargada.");
+    }
+  }
+}
+
+function toggleWordList() {
+  const display = document.getElementById("wordListDisplay");
+  display.style.display = display.style.display === "none" ? "block" : "none";
+  renderWordList();
+}
+
+function toggleSort() {
+  sortAscending = !sortAscending;
+  renderWordList();
+}
+
+function renderWordList() {
+  const display = document.getElementById("wordListDisplay");
+  let sorted = [...wordList];
+  sorted.sort((a, b) => sortAscending ? a.localeCompare(b) : b.localeCompare(a));
+  display.innerHTML = sorted.map(w =>
+    `<div><span class="used-letter" onclick="speakText('${w}')">${w}</span> <a href='https://www.wordreference.com/es/en/translation.asp?spen=${encodeURIComponent(w)}' target='_blank'>(Referencia)</a></div>`
+  ).join("");
+}
+
+function fullReset() {
+  guessedLetters = [];
+  wrongGuesses = 0;
+  correctWords = [];
+  score1 = 0;
+  score2 = 0;
+  playerModeLocked = false;
+  numPlayers = 1;
+  currentGuesser = 2;
+  wordList = [
+    'casa','mesa','silla','puerta','ventana','cocina','baño','jardín','espejo','cuadro',
+    'lámpara','reloj','gato','perro','conejo','caballo','vaca','oveja','cerdo','pato',
+    'ratón','león','cebra','jirafa'
+  ];
+
+  document.getElementById("radio1").disabled = false;
+  document.getElementById("radio2").disabled = false;
+  document.getElementById("radio1").checked = true;
+  document.getElementById("startBtn").disabled = false;
+  document.getElementById("twoPlayerInput").style.display = "none";
+  document.getElementById("player1Word").value = "";
+  document.getElementById("guessSection").style.display = "none";
+
+  updateScores();
+  updateFoundWords();
+  updateUsedLettersDisplay();
+  clearBullseye();
+  drawLives();
+}
+</script>
+</body>
+</html>

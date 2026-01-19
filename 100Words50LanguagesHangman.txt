@@ -1,0 +1,665 @@
+const wordLists = {
+    'English': [
+        'apple', 'banana', 'orange', 'guitar', 'fantasy', 'mountain', 'adventure', 'whisper', 'sunshine', 'dolphin', 
+        'elephant', 'freedom', 'glacier', 'history', 'journey', 'kangaroo', 'library', 'mermaid', 'notebook', 'oceanic',
+        'puzzle', 'quicksand', 'rainbow', 'starlight', 'treasure', 'umbrella', 'volcano', 'waterfall', 'xylophone', 
+        'yellowish', 'zebra', 'backpack', 'coconut', 'diameter', 'engineer', 'firework', 'grateful', 'holiday', 'internet', 
+        'jungle', 'knight', 'laughter', 'mystery', 'nostalgia', 'octopus', 'penguin', 'quality', 'radiator', 'sapphire', 
+        'telescope', 'umbrella', 'velocity', 'whistle', 'xenophobia', 'yearbook', 'zephyr', 'balloon', 'compass', 
+        'discovery', 'education', 'flamingo', 'goldfish', 'harmony', 'island', 'jasmine', 'knowledge', 'landscape', 
+        'mountaineer', 'nostalgic', 'octagonal', 'pacific', 'quietness', 'rosemary', 'seahorse', 'tornado', 'utopia', 
+        'volleyball', 'whirlpool', 'xylophonist', 'yellowtail', 'zoologist', 'beverage', 'clarity', 'dragonfly', 
+        'eclipse', 'flourish', 'gravity', 'hurricane', 'iceberg', 'jaguar', 'koala', 'leopard', 'mineral', 'nebula', 
+        'orchestra', 'paradise', 'quirky', 'riddle', 'serenity', 'tsunami', 'universe', 'victorious'
+    ],
+    'Spanish': [
+        'manzana', 'platano', 'naranja', 'guitarra', 'fantasia', 'montana', 'aventura', 'susurro', 'sol', 'delfin', 
+        'elefante', 'libertad', 'glaciar', 'historia', 'viaje', 'canguro', 'biblioteca', 'sirena', 'cuaderno', 'oceanico',
+        'rompecabezas', 'arena', 'arcoiris', 'estrella', 'tesoro', 'paraguas', 'volcan', 'cascada', 'xilofono', 
+        'amarillo', 'cebra', 'mochila', 'coco', 'diametro', 'ingeniero', 'fuegos', 'agradecido', 'vacaciones', 'internet', 
+        'selva', 'caballero', 'risa', 'misterio', 'nostalgia', 'pulpo', 'pingüino', 'calidad', 'radiador', 'zafiro', 
+        'telescopio', 'paraguas', 'velocidad', 'silbar', 'xenofobia', 'anuario', 'céfiro', 'globo', 'brújula', 
+        'descubrimiento', 'educacion', 'flamenco', 'pez', 'armonía', 'isla', 'jazmín', 'conocimiento', 'paisaje', 
+        'alpinista', 'nostálgico', 'octagonal', 'pacifico', 'tranquilidad', 'romero', 'caballito', 'tornado', 'utopia', 
+        'voleibol', 'remolino', 'xilofonista', 'pez', 'zoologo', 'bebida', 'claridad', 'libélula', 
+        'eclipse', 'florecer', 'gravedad', 'huracán', 'iceberg', 'jaguar', 'koala', 'leopardo', 'mineral', 'nebulosa', 
+        'orquesta', 'paraiso', 'peculiar', 'adivinanza', 'serenidad', 'tsunami', 'universo', 'victorioso'
+    ],
+    'Chinese': [
+        '苹果', '香蕉', '橙子', '吉他', '幻想', '山', '冒险', '耳语', '阳光', '海豚', 
+        '大象', '自由', '冰川', '历史', '旅程', '袋鼠', '图书馆', '美人鱼', '笔记本', '海洋',
+        '拼图', '流沙', '彩虹', '星光', '宝藏', '雨伞', '火山', '瀑布', '木琴', 
+        '黄色', '斑马', '背包', '椰子', '直径', '工程师', '烟花', '感恩', '假期', '互联网', 
+        '丛林', '骑士', '笑声', '谜团', '怀旧', '章鱼', '企鹅', '质量', '散热器', '蓝宝石', 
+        '望远镜', '雨伞', '速度', '口哨', '排外', '年鉴', '和风', '气球', '指南针', 
+        '发现', '教育', '火烈鸟', '金鱼', '和谐', '岛屿', '茉莉花', '知识', '风景', 
+        '登山者', '怀旧', '八边形', '太平洋', '安静', '迷迭香', '海马', '龙卷风', '乌托邦', 
+        '排球', '漩涡', '木琴手', '黄尾鱼', '动物学家', '饮料', '清晰', '蜻蜓', 
+        '日食', '繁荣', '重力', '飓风', '冰山', '美洲虎', '考拉', '豹', '矿物', '星云', 
+        '管弦乐队', '天堂', '古怪', '谜语', '宁静', '海啸', '宇宙', '胜利'
+    ],
+    'Hindi': [
+        'सेब', 'केला', 'संतरा', 'गिटार', 'कल्पना', 'पहाड़', 'साहसिक', 'फुसफुसाहट', 'धूप', 'डॉल्फिन', 
+        'हाथी', 'स्वतंत्रता', 'हिमनद', 'इतिहास', 'यात्रा', 'कंगारू', 'पुस्तकालय', 'जलपरी', 'कॉपीबुक', 'महासागरीय',
+        'पहेली', 'रेत', 'इंद्रधनुष', 'तारों', 'खजाना', 'छाता', 'ज्वालामुखी', 'झरना', 'संगीत वाद्ययंत्र', 
+        'पीला', 'जेब्रा', 'बैग', 'नारियल', 'व्यास', 'इंजीनियर', 'पटाखे', 'कृतज्ञ', 'छुट्टी', 'इंटरनेट', 
+        'जंगल', 'शूरवीर', 'हँसी', 'रहस्य', 'उदासी', 'ऑक्टोपस', 'पेंगुइन', 'गुणवत्ता', 'रेडिएटर', 'नीलम', 
+        'दूरबीन', 'छाता', 'गति', 'सीटी', 'विदेशी', 'वार्षिक', 'पवन', 'गुब्बारा', 'कंपास', 
+        'खोज', 'शिक्षा', 'फ्लेमिंगो', 'सुनहरी मछली', 'सद्भाव', 'द्वीप', 'चमेली', 'ज्ञान', 'दृश्य', 
+        'पर्वतारोही', 'स्मरणीय', 'अष्टकोणीय', 'प्रशांत', 'शांत', 'रोज़मेरी', 'समुद्री घोड़ा', 'बवंडर', 'यूटोपिया', 
+        'वॉलीबॉल', 'भँवर', 'वादक', 'पीली मछली', 'चिड़ियाघर', 'पेय', 'स्पष्टता', 'ड्रैगनफ्लाई', 
+        'ग्रहण', 'खुशहाली', 'गुरुत्वाकर्षण', 'तूफान', 'हिमखंड', 'तेंदुआ', 'शैवाल', 'खनिज', 'निहारिका', 
+        'ऑर्केस्ट्रा', 'स्वर्ग', 'अजीब', 'पहेली', 'शांति', 'सुनामी', 'ब्रह्मांड', 'विजयी'
+    ],
+    'Arabic': [
+    'تفاحة', 'موز', 'برتقال', 'غيتار', 'خيال', 'جبل', 'مغامرة', 'همس', 'شمس', 'دلفين',
+    'فيل', 'حرية', 'نهر', 'تاريخ', 'رحلة', 'كنغر', 'مكتبة', 'حورية', 'دفتر', 'محاكي',
+    'لغز', 'رمل', 'قوسقزح', 'نجوم', 'كنز', 'مظلة', 'بركان', 'شلال', 'زرافة', 'زمرد',
+    'يقطين', 'موسيقى', 'مدرسة', 'بحر', 'أمل', 'سرير', 'مدينة', 'صديق', 'كتاب', 'ميدان',
+    'شاعر', 'تلميذ', 'شوكولاته', 'قمر', 'لؤلؤ', 'سفينة', 'قائد', 'فن', 'صور', 'شجاع',
+    'حيوان', 'الرياح', 'العالم', 'بذور', 'بداية', 'مصباح', 'نظارة', 'ظلام', 'كوكب', 'سمك',
+    'قراءة', 'طائرة', 'سيارة', 'منزل', 'غابة', 'ملابس', 'الطعام', 'قبعة', 'العائلة', 'فيلم',
+    'كرة', 'لعبة', 'الزهور', 'قطار', 'دراجة', 'حديقة', 'بحيرة', 'نهر', 'طبيب', 'طيار',
+    'ثعلب', 'مسرح', 'الجبال', 'الصحراء', 'نجاح', 'فن', 'رياضة', 'أسرار', 'قصص', 'أبطال',
+    'حديقة', 'حلوى', 'الحرية', 'سلام', 'سعادة', 'سفر', 'مدينة', 'أخبار', 'إجازة', 'سياحة'
+	],
+	'Portuguese': [
+    'maçã', 'banana', 'laranja', 'guitarra', 'fantasia', 'montanha', 'aventura', 'sussurro', 'sol', 'golfinho',
+    'elefante', 'liberdade', 'geleira', 'história', 'viagem', 'canguru', 'biblioteca', 'sereia', 'caderno', 'oceânico',
+    'quebra-cabeça', 'areia', 'arco-íris', 'estrela', 'tesouro', 'guarda-chuva', 'vulcão', 'cachoeira', 'girafa', 'esmeralda',
+    'abóbora', 'música', 'escola', 'mar', 'esperança', 'cama', 'cidade', 'amigo', 'livro', 'praça',
+    'poeta', 'aluno', 'chocolate', 'lua', 'pérola', 'navio', 'líder', 'arte', 'fotos', 'corajoso',
+    'animal', 'vento', 'mundo', 'sementes', 'começo', 'lâmpada', 'óculos', 'escuridão', 'planeta', 'peixe',
+    'leitura', 'avião', 'carro', 'casa', 'floresta', 'roupas', 'comida', 'chapéu', 'família', 'filme',
+    'bola', 'jogo', 'flores', 'trem', 'bicicleta', 'jardim', 'lago', 'rio', 'médico', 'piloto',
+    'raposa', 'teatro', 'montanhas', 'deserto', 'sucesso', 'arte', 'esporte', 'segredos', 'histórias', 'heróis',
+    'parque', 'doce', 'liberdade', 'paz', 'felicidade', 'viagem', 'cidade', 'notícias', 'férias', 'turismo'
+	],
+	'Bengali': [
+    'আপেল', 'কলা', 'কমলা', 'গিটার', 'কল্পনা', 'পর্বত', 'অভিযান', 'ফিসফিস', 'সূর্য', 'ডলফিন',
+    'হাতি', 'স্বাধীনতা', 'হিমবাহ', 'ইতিহাস', 'যাত্রা', 'ক্যাঙ্গারু', 'গ্রন্থাগার', 'মৎস্যকন্যা', 'নোটবুক', 'সমুদ্র',
+    'ধাঁধা', 'বালু', 'রামধনু', 'তারকা', 'ধন', 'ছাতা', 'আগ্নেয়গিরি', 'ঝর্ণা', 'জিরাফ', 'পান্না',
+    'কুমড়া', 'সঙ্গীত', 'বিদ্যালয়', 'সমুদ্র', 'আশা', 'বিছানা', 'শহর', 'বন্ধু', 'বই', 'স্কোয়ার',
+    'কবি', 'ছাত্র', 'চকোলেট', 'চাঁদ', 'মুক্তা', 'জাহাজ', 'নেতা', 'শিল্প', 'ছবি', 'সাহসী',
+    'প্রাণী', 'বাতাস', 'পৃথিবী', 'বীজ', 'শুরু', 'ল্যাম্প', 'চশমা', 'অন্ধকার', 'গ্রহ', 'মাছ',
+    'পড়া', 'বিমান', 'গাড়ি', 'বাড়ি', 'বন', 'পোশাক', 'খাবার', 'টুপি', 'পরিবার', 'চলচ্চিত্র',
+    'বল', 'খেলা', 'ফুল', 'ট্রেন', 'সাইকেল', 'বাগান', 'হ্রদ', 'নদী', 'ডাক্তার', 'পাইলট',
+    'শিয়াল', 'থিয়েটার', 'পর্বতমালা', 'মরুভূমি', 'সাফল্য', 'শিল্প', 'ক্রীড়া', 'গোপন', 'গল্প', 'নায়ক',
+    'পার্ক', 'মিষ্টি', 'স্বাধীনতা', 'শান্তি', 'সুখ', 'ভ্রমণ', 'শহর', 'সংবাদ', 'ছুটি', 'পর্যটন'
+	],
+	'Russian': [
+    'яблоко', 'банан', 'апельсин', 'гитара', 'фантазия', 'гора', 'приключение', 'шепот', 'солнце', 'дельфин',
+    'слон', 'свобода', 'ледник', 'история', 'путешествие', 'кенгуру', 'библиотека', 'русалка', 'тетрадь', 'океан',
+    'головоломка', 'песок', 'радуга', 'звезда', 'сокровище', 'зонт', 'вулкан', 'водопад', 'жираф', 'изумруд',
+    'тыква', 'музыка', 'школа', 'море', 'надежда', 'кровать', 'город', 'друг', 'книга', 'площадь',
+    'поэт', 'ученик', 'шоколад', 'луна', 'жемчуг', 'корабль', 'лидер', 'искусство', 'фото', 'смелый',
+    'животное', 'ветер', 'мир', 'семена', 'начало', 'лампа', 'очки', 'тьма', 'планета', 'рыба',
+    'чтение', 'самолет', 'машина', 'дом', 'лес', 'одежда', 'еда', 'шляпа', 'семья', 'фильм',
+    'мяч', 'игра', 'цветы', 'поезд', 'велосипед', 'сад', 'озеро', 'река', 'врач', 'пилот',
+    'лиса', 'театр', 'горы', 'пустыня', 'успех', 'искусство', 'спорт', 'секреты', 'истории', 'герои',
+    'парк', 'сладости', 'свобода', 'мир', 'счастье', 'путешествие', 'город', 'новости', 'каникулы', 'туризм'
+	],
+	'Japanese': [
+    'りんご', 'バナナ', 'オレンジ', 'ギター', 'ファンタジー', '山', '冒険', 'ささやき', '太陽', 'イルカ',
+    '象', '自由', '氷河', '歴史', '旅', 'カンガルー', '図書館', '人魚', 'ノート', '海',
+    'パズル', '砂', '虹', '星', '宝物', '傘', '火山', '滝', 'キリン', 'エメラルド',
+    'かぼちゃ', '音楽', '学校', '海', '希望', 'ベッド', '都市', '友達', '本', '広場',
+    '詩人', '学生', 'チョコレート', '月', '真珠', '船', 'リーダー', 'アート', '写真', '勇敢',
+    '動物', '風', '世界', '種', '開始', 'ランプ', 'メガネ', '暗闇', '惑星', '魚',
+    '読書', '飛行機', '車', '家', '森', '服', '食べ物', '帽子', '家族', '映画',
+    'ボール', 'ゲーム', '花', '電車', '自転車', '庭', '湖', '川', '医者', 'パイロット',
+    'キツネ', '劇場', '山々', '砂漠', '成功', 'アート', 'スポーツ', '秘密', '物語', 'ヒーロー',
+    '公園', 'お菓子', '自由', '平和', '幸せ', '旅行', '都市', 'ニュース', '休暇', '観光'
+	],
+	'German': [
+    'apfel', 'banane', 'orange', 'gitarre', 'fantasie', 'berg', 'abenteuer', 'flüstern', 'sonne', 'delfin',
+    'elefant', 'freiheit', 'gletscher', 'geschichte', 'reise', 'känguru', 'bibliothek', 'meerjungfrau', 'notizbuch', 'ozean',
+    'rätsel', 'sand', 'regenbogen', 'stern', 'schatz', 'schirm', 'vulkan', 'wasserfall', 'giraffe', 'smaragd',
+    'kürbis', 'musik', 'schule', 'meer', 'hoffnung', 'bett', 'stadt', 'freund', 'buch', 'platz',
+    'dichter', 'schüler', 'schokolade', 'mond', 'perle', 'schiff', 'führer', 'kunst', 'fotos', 'mutig',
+    'tier', 'wind', 'welt', 'samen', 'anfang', 'lampe', 'brille', 'dunkelheit', 'planet', 'fisch',
+    'lesen', 'flugzeug', 'auto', 'haus', 'wald', 'kleidung', 'essen', 'hut', 'familie', 'film',
+    'ball', 'spiel', 'blumen', 'zug', 'fahrrad', 'garten', 'see', 'fluss', 'arzt', 'pilot',
+    'fuchs', 'theater', 'berge', 'wüste', 'erfolg', 'kunst', 'sport', 'geheimnisse', 'geschichten', 'helden',
+    'park', 'süßigkeiten', 'freiheit', 'frieden', 'glück', 'reise', 'stadt', 'nachrichten', 'urlaub', 'tourismus'
+	],
+	'Bengali': [
+    'আপেল', 'কলা', 'কমলা', 'গিটার', 'কল্পনা', 'পর্বত', 'অভিযান', 'ফিসফিস', 'সূর্য', 'ডলফিন',
+    'হাতি', 'স্বাধীনতা', 'হিমবাহ', 'ইতিহাস', 'যাত্রা', 'ক্যাঙ্গারু', 'গ্রন্থাগার', 'মৎস্যকন্যা', 'নোটবুক', 'সমুদ্র',
+    'ধাঁধা', 'বালু', 'রামধনু', 'তারকা', 'ধন', 'ছাতা', 'আগ্নেয়গিরি', 'ঝর্ণা', 'জিরাফ', 'পান্না',
+    'কুমড়া', 'সঙ্গীত', 'বিদ্যালয়', 'সমুদ্র', 'আশা', 'বিছানা', 'শহর', 'বন্ধু', 'বই', 'স্কোয়ার',
+    'কবি', 'ছাত্র', 'চকোলেট', 'চাঁদ', 'মুক্তা', 'জাহাজ', 'নেতা', 'শিল্প', 'ছবি', 'সাহসী',
+    'প্রাণী', 'বাতাস', 'পৃথিবী', 'বীজ', 'শুরু', 'ল্যাম্প', 'চশমা', 'অন্ধকার', 'গ্রহ', 'মাছ',
+    'পড়া', 'বিমান', 'গাড়ি', 'বাড়ি', 'বন', 'পোশাক', 'খাবার', 'টুপি', 'পরিবার', 'চলচ্চিত্র',
+    'বল', 'খেলা', 'ফুল', 'ট্রেন', 'সাইকেল', 'বাগান', 'হ্রদ', 'নদী', 'ডাক্তার', 'পাইলট',
+    'শিয়াল', 'থিয়েটার', 'পর্বতমালা', 'মরুভূমি', 'সাফল্য', 'শিল্প', 'ক্রীড়া', 'গোপন', 'গল্প', 'নায়ক',
+    'পার্ক', 'মিষ্টি', 'স্বাধীনতা', 'শান্তি', 'সুখ', 'ভ্রমণ', 'শহর', 'সংবাদ', 'ছুটি', 'পর্যটন'
+	],
+	'French': [
+    'pomme', 'banane', 'orange', 'guitare', 'fantaisie', 'montagne', 'aventure', 'murmure', 'soleil', 'dauphin',
+    'éléphant', 'liberté', 'glacier', 'histoire', 'voyage', 'kangourou', 'bibliothèque', 'sirène', 'carnet', 'océan',
+    'puzzle', 'sable', 'arc-en-ciel', 'étoile', 'trésor', 'parapluie', 'volcan', 'cascade', 'girafe', 'émeraude',
+    'citrouille', 'musique', 'école', 'mer', 'espoir', 'lit', 'ville', 'ami', 'livre', 'place',
+    'poète', 'élève', 'chocolat', 'lune', 'perle', 'navire', 'chef', 'art', 'photo', 'courageux',
+    'animal', 'vent', 'monde', 'graines', 'début', 'lampe', 'lunettes', 'obscurité', 'planète', 'poisson',
+    'lecture', 'avion', 'voiture', 'maison', 'forêt', 'vêtements', 'nourriture', 'chapeau', 'famille', 'film',
+    'balle', 'jeu', 'fleurs', 'train', 'vélo', 'jardin', 'lac', 'rivière', 'médecin', 'pilote',
+    'renard', 'théâtre', 'montagnes', 'désert', 'succès', 'art', 'sport', 'secrets', 'histoires', 'héros',
+    'parc', 'bonbons', 'liberté', 'paix', 'bonheur', 'voyage', 'ville', 'nouvelles', 'vacances', 'tourisme'
+	],
+	'Javanese': [
+    'apel', 'pisang', 'jeruk', 'gitar', 'fantasi', 'gunung', 'petualangan', 'bisikan', 'matahari', 'lumba-lumba',
+    'gajah', 'kebebasan', 'gletser', 'sejarah', 'perjalanan', 'kanguru', 'perpustakaan', 'putri duyung', 'buku catatan', 'samudra',
+    'teka-teki', 'pasir', 'pelangi', 'bintang', 'harta karun', 'payung', 'gunung berapi', 'air terjun', 'jerapah', 'zamrud',
+    'labu', 'musik', 'sekolah', 'laut', 'harapan', 'tempat tidur', 'kota', 'teman', 'buku', 'alun-alun',
+    'penyair', 'siswa', 'cokelat', 'bulan', 'mutiara', 'kapal', 'pemimpin', 'seni', 'foto', 'berani',
+    'hewan', 'angin', 'dunia', 'benih', 'awal', 'lampu', 'kacamata', 'kegelapan', 'planet', 'ikan',
+    'membaca', 'pesawat', 'mobil', 'rumah', 'hutan', 'pakaian', 'makanan', 'topi', 'keluarga', 'film',
+    'bola', 'permainan', 'bunga', 'kereta', 'sepeda', 'taman', 'danau', 'sungai', 'dokter', 'pilot',
+    'rubah', 'teater', 'pegunungan', 'gurun', 'kesuksesan', 'seni', 'olahraga', 'rahasia', 'cerita', 'pahlawan',
+    'taman', 'permen', 'kebebasan', 'damai', 'kebahagiaan', 'perjalanan', 'kota', 'berita', 'liburan', 'wisata'
+	],
+	'Korean': [
+    '사과', '바나나', '오렌지', '기타', '환상', '산', '모험', '속삭임', '태양', '돌고래',
+    '코끼리', '자유', '빙하', '역사', '여행', '캥거루', '도서관', '인어', '노트', '바다',
+    '퍼즐', '모래', '무지개', '별', '보물', '우산', '화산', '폭포', '기린', '에메랄드',
+    '호박', '음악', '학교', '바다', '희망', '침대', '도시', '친구', '책', '광장',
+    '시인', '학생', '초콜릿', '달', '진주', '배', '리더', '예술', '사진', '용감한',
+    '동물', '바람', '세상', '씨앗', '시작', '램프', '안경', '어둠', '행성', '물고기',
+    '독서', '비행기', '자동차', '집', '숲', '옷', '음식', '모자', '가족', '영화',
+    '공', '게임', '꽃', '기차', '자전거', '정원', '호수', '강', '의사', '조종사',
+    '여우', '극장', '산맥', '사막', '성공', '예술', '스포츠', '비밀', '이야기', '영웅',
+    '공원', '사탕', '자유', '평화', '행복', '여행', '도시', '뉴스', '휴가', '관광'
+	],
+	'Vietnamese': [
+    'táo', 'chuối', 'cam', 'đàn', 'ảo tưởng', 'núi', 'phiêu lưu', 'thì thầm', 'mặt trời', 'cá heo',
+    'voi', 'tự do', 'sông băng', 'lịch sử', 'chuyến đi', 'chuột túi', 'thư viện', 'nàng tiên cá', 'sổ tay', 'đại dương',
+    'câu đố', 'cát', 'cầu vồng', 'ngôi sao', 'kho báu', 'ô dù', 'núi lửa', 'thác nước', 'hươu cao cổ', 'ngọc lục bảo',
+    'bí ngô', 'âm nhạc', 'trường học', 'biển', 'hy vọng', 'giường', 'thành phố', 'bạn bè', 'sách', 'quảng trường',
+    'nhà thơ', 'học sinh', 'sô cô la', 'mặt trăng', 'ngọc trai', 'thuyền', 'lãnh đạo', 'nghệ thuật', 'hình ảnh', 'dũng cảm',
+    'động vật', 'gió', 'thế giới', 'hạt giống', 'bắt đầu', 'đèn', 'kính', 'bóng tối', 'hành tinh', 'cá',
+    'đọc', 'máy bay', 'xe hơi', 'nhà', 'rừng', 'quần áo', 'thức ăn', 'mũ', 'gia đình', 'phim',
+    'bóng', 'trò chơi', 'hoa', 'tàu', 'xe đạp', 'vườn', 'hồ', 'sông', 'bác sĩ', 'phi công',
+    'cáo', 'rạp hát', 'núi', 'sa mạc', 'thành công', 'nghệ thuật', 'thể thao', 'bí mật', 'câu chuyện', 'anh hùng',
+    'công viên', 'kẹo', 'tự do', 'hòa bình', 'hạnh phúc', 'chuyến đi', 'thành phố', 'tin tức', 'kỳ nghỉ', 'du lịch'
+	],
+	'Telugu': [
+    'ఆపిల్', 'అరటి', 'కామ', 'గిటార్', 'కల్పన', 'పర్వతం', 'సాహస', 'గుసగుస', 'సూర్యుడు', 'డాల్ఫిన్',
+    'ఏనుగు', 'స్వేచ్ఛ', 'హిమపుష్ప', 'చరిత్ర', 'యాత్ర', 'కంగారు', 'గ్రంథాలయం', 'మీనకన్య', 'నోట్‌బుక్', 'సముద్రం',
+    'పజిల్', 'మణళి', 'రెయిన్‌బో', 'నక్షత్రం', 'నిధి', 'చాట్రం', 'అగ్నిపర్వతం', 'జలపాతం', 'జిరాఫీ', 'పచ్చబెరడు',
+    'గుమ్మడి', 'సంగీతం', 'పాఠశాల', 'సముద్రం', 'ఆశ', 'బెడ్', 'నగరం', 'స్నేహితుడు', 'పుస్తకం', 'చౌక',
+    'కవి', 'విద్యార్థి', 'చాక్లెట్', 'చంద్రుడు', 'ముత్యము', 'నౌక', 'నాయకుడు', 'కళ', 'ఫోటో', 'ధైర్యం',
+    'జంతువు', 'గాలి', 'లోకం', 'విత్తనం', 'ప్రారంభం', 'దీపం', 'కళ్లద్దాలు', 'అంధకారం', 'గ్రహం', 'చేప',
+    'చదువు', 'విమానము', 'కారు', 'ఇల్లు', 'అడవి', 'బట్టలు', 'ఆహారం', 'తలపాగ', 'కుటుంబం', 'సినిమా',
+    'బంతి', 'ఆట', 'పువ్వు', 'రైలు', 'సైకిల్', 'తోట', 'ఏరు', 'నది', 'డాక్టర్', 'విమానపైలట్',
+    'నక్క', 'నాటకశాల', 'పర్వతాలు', 'ఎడారి', 'విజయం', 'కళ', 'క్రీడలు', 'రహస్యం', 'కథ', 'వీరుడు',
+    'పార్క్', 'తీపి', 'స్వేచ్ఛ', 'శాంతి', 'ఆనందం', 'యాత్ర', 'నగరం', 'వార్తలు', 'విహారం', 'పర్యాటకం'
+	],
+	'Marathi': [
+    'सफरचंद', 'केळं', 'संत्रा', 'गिटार', 'कल्पना', 'डोंगर', 'साहस', 'खोबरेल', 'सूर्य', 'डॉल्फिन',
+    'हत्ती', 'स्वातंत्र्य', 'हिमनदी', 'इतिहास', 'प्रवास', 'कांगारू', 'ग्रंथालय', 'मत्स्यकन्या', 'वह्या', 'महासागर',
+    'कोडे', 'वाळू', 'इंद्रधनुष्य', 'तारा', 'खजिना', 'छत्री', 'ज्वालामुखी', 'धबधबा', 'जिराफ', 'पाचू',
+    'कोहळा', 'संगीत', 'शाळा', 'समुद्र', 'आशा', 'खाट', 'शहर', 'मित्र', 'पुस्तक', 'चौक',
+    'कवी', 'विद्यार्थी', 'चॉकलेट', 'चंद्र', 'मोती', 'जहाज', 'नेता', 'कला', 'फोटो', 'धैर्य',
+    'प्राणी', 'वारा', 'जग', 'बियाणे', 'सुरुवात', 'दिवा', 'चष्मा', 'अंधार', 'ग्रह', 'मासे',
+    'वाचन', 'विमान', 'कार', 'घर', 'जंगल', 'कपडे', 'अन्न', 'टोपी', 'कुटुंब', 'चित्रपट',
+    'चेंडू', 'खेळ', 'फूल', 'ट्रेन', 'सायकल', 'बाग', 'तलाव', 'नदी', 'डॉक्टर', 'वैमानिक',
+    'कोल्हा', 'नाटक', 'पर्वत', 'वाळवंट', 'यश', 'कला', 'क्रीडा', 'गुपिते', 'कथा', 'नायक',
+    'उद्यान', 'गोळ्या', 'स्वातंत्र्य', 'शांती', 'आनंद', 'प्रवास', 'शहर', 'बातम्या', 'सुट्टी', 'पर्यटन'
+	],
+	'Turkish': [
+    'elma', 'muz', 'portakal', 'gitar', 'fantezi', 'dağ', 'macera', 'fısıltı', 'güneş', 'yunus',
+    'fil', 'özgürlük', 'buzul', 'tarih', 'yolculuk', 'kanguru', 'kütüphane', 'denizkızı', 'not defteri', 'okyanus',
+    'bulmaca', 'kum', 'gökkuşağı', 'yıldız', 'hazine', 'şemsiye', 'yanardağ', 'şelale', 'zürafa', 'zümrüt',
+    'bal kabağı', 'müzik', 'okul', 'deniz', 'umut', 'yatak', 'şehir', 'arkadaş', 'kitap', 'meydan',
+    'şair', 'öğrenci', 'çikolata', 'ay', 'inci', 'gemi', 'lider', 'sanat', 'fotoğraf', 'cesur',
+    'hayvan', 'rüzgar', 'dünya', 'tohum', 'başlangıç', 'lamba', 'gözlük', 'karanlık', 'gezegen', 'balık',
+    'okuma', 'uçak', 'araba', 'ev', 'orman', 'giysi', 'yemek', 'şapka', 'aile', 'film',
+    'top', 'oyun', 'çiçekler', 'tren', 'bisiklet', 'bahçe', 'göl', 'nehir', 'doktor', 'pilot',
+    'tilki', 'tiyatro', 'dağlar', 'çöl', 'başarı', 'sanat', 'spor', 'sırlar', 'hikayeler', 'kahramanlar',
+    'park', 'şeker', 'özgürlük', 'barış', 'mutluluk', 'seyahat', 'şehir', 'haberler', 'tatil', 'turizm'
+	],
+	'Tamil': [
+    'ஆப்பிள்', 'வாழை', 'ஆரஞ்சு', 'கிடார்', 'கற்பனை', 'மலை', 'சாகசம்', 'இசை', 'சூரியன்', 'பாறைமீன்',
+    'யானை', 'சுதந்திரம்', 'பனிமலை', 'வரலாறு', 'பயணம்', 'கங்காரு', 'நூலகம்', 'மீன்கன்னி', 'நோட்டுப் புத்தகம்', 'கடல்',
+    'புதிர்', 'மண்', 'வானவில்', 'நட்சத்திரம்', 'பொருள்', 'குடை', 'எரிமலை', 'அருவி', 'ஒட்டகச்சிவிங்கி', 'எமரால்டு',
+    'பூசணி', 'இசை', 'பள்ளி', 'கடல்', 'நம்பிக்கை', 'படுக்கை', 'நகரம்', 'நண்பன்', 'புத்தகம்', 'சதுக்கம்',
+    'கவிஞர்', 'மாணவன்', 'சாக்லேட்', 'சந்திரன்', 'முத்து', 'கப்பல்', 'தலைவர்', 'கலை', 'புகைப்படம்', 'தைரியம்',
+    'விலங்கு', 'காற்று', 'உலகம்', 'விதை', 'தொடக்கம்', 'விளக்கு', 'கண்ணாடி', 'இருள்', 'கிரகம்', 'மீன்',
+    'வாசிப்பு', 'விமானம்', 'கார்', 'வீடு', 'காடு', 'உடை', 'உணவு', 'தோப்பு', 'குடும்பம்', 'திரைப்படம்',
+    'பந்து', 'விளையாட்டு', 'மலர்', 'ரயில்', 'மிதிவண்டி', 'தோட்டம்', 'ஏரி', 'நதி', 'மருத்துவர்', 'விமானி',
+    'நரி', 'நாடகவிளையாட்டு', 'மலைகள்', 'வெறுமை', 'வெற்றி', 'கலை', 'விளையாட்டு', 'ரகசியம்', 'கதை', 'நாயகன்',
+    'பூங்கா', 'இனிப்பு', 'சுதந்திரம்', 'அமைதி', 'மகிழ்ச்சி', 'பயணம்', 'நகரம்', 'செய்திகள்', 'விடுமுறை', 'சுற்றுலா'
+	],
+	'Urdu': [
+    'سیب', 'کیلا', 'سنترہ', 'گٹار', 'تصور', 'پہاڑ', 'مہم', 'سرگوشی', 'سورج', 'ڈالفن',
+    'ہاتھی', 'آزادی', 'گلیشیئر', 'تاریخ', 'سفر', 'کینگرو', 'لائبریری', 'جل پری', 'نوٹ بک', 'سمندر',
+    'پہیلی', 'ریت', 'قوس قزح', 'ستارہ', 'خزانہ', 'چھتری', 'آتش فشاں', 'آبشار', 'زرافہ', 'زمرد',
+    'کدو', 'موسیقی', 'اسکول', 'سمندر', 'امید', 'بستر', 'شہر', 'دوست', 'کتاب', 'چوک',
+    'شاعر', 'طالب علم', 'چاکلیٹ', 'چاند', 'موتی', 'جہاز', 'لیڈر', 'فن', 'تصویر', 'بہادر',
+    'جانور', 'ہوا', 'دنیا', 'بیج', 'آغاز', 'چراغ', 'عینک', 'اندھیرا', 'سیارہ', 'مچھلی',
+    'مطالعہ', 'ہوائی جہاز', 'گاڑی', 'گھر', 'جنگل', 'کپڑے', 'کھانا', 'ٹوپی', 'خاندان', 'فلم',
+    'بال', 'کھیل', 'پھول', 'ٹرین', 'سائیکل', 'باغ', 'جھیل', 'دریا', 'ڈاکٹر', 'پائلٹ',
+    'لومڑی', 'تھیٹر', 'پہاڑ', 'صحرا', 'کامیابی', 'فن', 'کھیل', 'راز', 'کہانی', 'ہیرو',
+    'پارک', 'مٹھائی', 'آزادی', 'امن', 'خوشی', 'سفر', 'شہر', 'خبریں', 'چھٹی', 'سیاحت'
+	],
+	'Italian': [
+    'mela', 'banana', 'arancia', 'chitarra', 'fantasia', 'montagna', 'avventura', 'sussurro', 'sole', 'delfino',
+    'elefante', 'libertà', 'ghiacciaio', 'storia', 'viaggio', 'canguro', 'biblioteca', 'sirena', 'taccuino', 'oceano',
+    'puzzle', 'sabbia', 'arcobaleno', 'stella', 'tesoro', 'ombrello', 'vulcano', 'cascata', 'giraffa', 'smeraldo',
+    'zucca', 'musica', 'scuola', 'mare', 'speranza', 'letto', 'città', 'amico', 'libro', 'piazza',
+    'poeta', 'studente', 'cioccolato', 'luna', 'perla', 'nave', 'capo', 'arte', 'foto', 'coraggioso',
+    'animale', 'vento', 'mondo', 'semi', 'inizio', 'lampada', 'occhiali', 'buio', 'pianeta', 'pesce',
+    'lettura', 'aereo', 'macchina', 'casa', 'foresta', 'vestiti', 'cibo', 'cappello', 'famiglia', 'film',
+    'palla', 'gioco', 'fiori', 'treno', 'bicicletta', 'giardino', 'lago', 'fiume', 'medico', 'pilota',
+    'volpe', 'teatro', 'montagne', 'deserto', 'successo', 'arte', 'sport', 'segreti', 'storie', 'eroi',
+    'parco', 'caramelle', 'libertà', 'pace', 'felicità', 'viaggio', 'città', 'notizie', 'vacanza', 'turismo'
+	],
+	'Thai': [
+    'แอปเปิ้ล', 'กล้วย', 'ส้ม', 'กีตาร์', 'จินตนาการ', 'ภูเขา', 'การผจญภัย', 'กระซิบ', 'ดวงอาทิตย์', 'โลมา',
+    'ช้าง', 'เสรีภาพ', 'ธารน้ำแข็ง', 'ประวัติศาสตร์', 'การเดินทาง', 'จิงโจ้', 'ห้องสมุด', 'นางเงือก', 'สมุดบันทึก', 'มหาสมุทร',
+    'ปริศนา', 'ทราย', 'สายรุ้ง', 'ดวงดาว', 'สมบัติ', 'ร่ม', 'ภูเขาไฟ', 'น้ำตก', 'ยีราฟ', 'มรกต',
+    'ฟักทอง', 'ดนตรี', 'โรงเรียน', 'ทะเล', 'ความหวัง', 'เตียง', 'เมือง', 'เพื่อน', 'หนังสือ', 'จัตุรัส',
+    'กวี', 'นักเรียน', 'ช็อคโกแลต', 'ดวงจันทร์', 'ไข่มุก', 'เรือ', 'ผู้นำ', 'ศิลปะ', 'ภาพถ่าย', 'กล้าหาญ',
+    'สัตว์', 'ลม', 'โลก', 'เมล็ด', 'การเริ่มต้น', 'โคมไฟ', 'แว่นตา', 'ความมืด', 'ดาวเคราะห์', 'ปลา',
+    'อ่าน', 'เครื่องบิน', 'รถ', 'บ้าน', 'ป่า', 'เสื้อผ้า', 'อาหาร', 'หมวก', 'ครอบครัว', 'ภาพยนตร์',
+    'ลูกบอล', 'เกม', 'ดอกไม้', 'รถไฟ', 'จักรยาน', 'สวน', 'ทะเลสาบ', 'แม่น้ำ', 'หมอ', 'นักบิน',
+    'สุนัขจิ้งจอก', 'โรงละคร', 'ภูเขา', 'ทะเลทราย', 'ความสำเร็จ', 'ศิลปะ', 'กีฬา', 'ความลับ', 'เรื่องราว', 'ฮีโร่',
+    'สวนสาธารณะ', 'ขนมหวาน', 'เสรีภาพ', 'สันติภาพ', 'ความสุข', 'การเดินทาง', 'เมือง', 'ข่าว', 'วันหยุด', 'การท่องเที่ยว'
+	],
+	'Gujarati': [
+    'સફરજન', 'કેળુ', 'સંતરો', 'ગીટાર', 'કલ્પના', 'પર્વત', 'સાહસ', 'કાનમાં કહેલુ', 'સૂર્ય', 'ડોલ્ફિન',
+    'હાથી', 'સ્વતંત્રતા', 'હિમનદી', 'ઇતિહાસ', 'પ્રવાસ', 'કાંગારુ', 'ગ્રંથાલય', 'માચલી કન્યા', 'નોટબુક', 'મહાસાગર',
+    'પ્રશ્નો', 'વાળુ', 'ઇન્દ્રધનુષ', 'તારક', 'ધન', 'છત્રી', 'જ્વાળામુખી', 'ધોધ', 'જીરાફ', 'પચ્ચું',
+    'કાકડી', 'સંગીત', 'શાળા', 'સમુદ્ર', 'આશા', 'ખાટ', 'શહેર', 'મિત્ર', 'પુસ્તક', 'ચોરાહો',
+    'કવિ', 'વિદ્યાર્થી', 'ચોકલેટ', 'ચંદ્ર', 'મોતી', 'જહાજ', 'નાયક', 'કલા', 'ફોટો', 'સહાસ',
+    'પ્રાણી', 'પવન', 'દુનિયા', 'બીજ', 'પ્રારંભ', 'દિવા', 'ચશ્માં', 'અંધકાર', 'ગ્રહ', 'માછલી',
+    'વાંચન', 'વિમાન', 'કાર', 'ઘર', 'જંગલ', 'કપડાં', 'ખોરાક', 'ટોપી', 'કુટુંબ', 'ફિલ્મ',
+    'ગોળ', 'રમત', 'ફૂલ', 'ટ્રેન', 'સાઇકલ', 'બગીચો', 'સરોવર', 'નદી', 'ડૉક્ટર', 'પાયલટ',
+    'સિયાળ', 'નાટક', 'પર્વત', 'મરુસ્થલ', 'સફળતા', 'કલા', 'રમતગમત', 'રહસ્યો', 'વાર્તા', 'વિર',
+    'બગીચો', 'મીઠાઈ', 'સ્વતંત્રતા', 'શાંતિ', 'ખુશી', 'પ્રવાસ', 'શહેર', 'સમાચાર', 'રજા', 'પર્યટન'
+	],
+	'Cantonese': [
+    '蘋果', '香蕉', '橙', '吉他', '幻想', '山', '冒險', '耳語', '太陽', '海豚',
+    '大象', '自由', '冰川', '歷史', '旅行', '袋鼠', '圖書館', '美人魚', '筆記本', '海洋',
+    '拼圖', '沙', '彩虹', '星', '寶藏', '雨傘', '火山', '瀑布', '長頸鹿', '翡翠',
+    '南瓜', '音樂', '學校', '海', '希望', '床', '城市', '朋友', '書', '廣場',
+    '詩人', '學生', '巧克力', '月亮', '珍珠', '船', '領袖', '藝術', '照片', '勇敢',
+    '動物', '風', '世界', '種子', '開始', '燈', '眼鏡', '黑暗', '行星', '魚',
+    '閱讀', '飛機', '車', '家', '森林', '衣服', '食物', '帽子', '家庭', '電影',
+    '球', '遊戲', '花', '火車', '自行車', '花園', '湖', '河', '醫生', '飛行員',
+    '狐狸', '劇院', '山脈', '沙漠', '成功', '藝術', '運動', '秘密', '故事', '英雄',
+    '公園', '糖果', '自由', '和平', '幸福', '旅行', '城市', '新聞', '假期', '旅遊'
+	],
+	'Persian': [
+    'سیب', 'موز', 'پرتقال', 'گیتار', 'خیال', 'کوه', 'ماجراجویی', 'زمزمه', 'خورشید', 'دلفین',
+    'فیل', 'آزادی', 'یخچال', 'تاریخ', 'سفر', 'کانگورو', 'کتابخانه', 'پری دریایی', 'دفترچه', 'اقیانوس',
+    'پازل', 'شن', 'رنگین‌کمان', 'ستاره', 'گنج', 'چتر', 'آتشفشان', 'آبشار', 'زرافه', 'زمرد',
+    'کدو تنبل', 'موسیقی', 'مدرسه', 'دریا', 'امید', 'تخت', 'شهر', 'دوست', 'کتاب', 'میدان',
+    'شاعر', 'دانش‌آموز', 'شکلات', 'ماه', 'مروارید', 'کشتی', 'رهبر', 'هنر', 'عکس', 'شجاع',
+    'حیوان', 'باد', 'دنیا', 'دانه', 'آغاز', 'چراغ', 'عینک', 'تاریکی', 'سیاره', 'ماهی',
+    'خواندن', 'هواپیما', 'ماشین', 'خانه', 'جنگل', 'لباس', 'غذا', 'کلاه', 'خانواده', 'فیلم',
+    'توپ', 'بازی', 'گل', 'قطار', 'دوچرخه', 'باغ', 'دریاچه', 'رودخانه', 'پزشک', 'خلبان',
+    'روباه', 'تئاتر', 'کوه', 'صحرا', 'موفقیت', 'هنر', 'ورزش', 'راز', 'داستان', 'قهرمان',
+    'پارک', 'شیرینی', 'آزادی', 'صلح', 'خوشحالی', 'سفر', 'شهر', 'اخبار', 'تعطیلات', 'گردشگری'
+	],
+	'Polish': [
+    'jabłko', 'banan', 'pomarańcza', 'gitara', 'fantazja', 'góra', 'przygoda', 'szept', 'słońce', 'delfin',
+    'słoń', 'wolność', 'lodowiec', 'historia', 'podróż', 'kangur', 'biblioteka', 'syrena', 'notatnik', 'ocean',
+    'układanka', 'piasek', 'tęcza', 'gwiazda', 'skarb', 'parasol', 'wulkan', 'wodospad', 'żyrafa', 'szmaragd',
+    'dynia', 'muzyka', 'szkoła', 'morze', 'nadzieja', 'łóżko', 'miasto', 'przyjaciel', 'książka', 'plac',
+    'poeta', 'uczeń', 'czekolada', 'księżyc', 'perła', 'statek', 'lider', 'sztuka', 'zdjęcie', 'odważny',
+    'zwierzę', 'wiatr', 'świat', 'nasiona', 'początek', 'lampa', 'okulary', 'ciemność', 'planeta', 'ryba',
+    'czytanie', 'samolot', 'samochód', 'dom', 'las', 'ubrania', 'jedzenie', 'kapelusz', 'rodzina', 'film',
+    'piłka', 'gra', 'kwiat', 'pociąg', 'rower', 'ogród', 'jezioro', 'rzeka', 'lekarz', 'pilot',
+    'lis', 'teatr', 'góry', 'pustynia', 'sukces', 'sztuka', 'sport', 'sekret', 'historia', 'bohater',
+    'park', 'cukierki', 'wolność', 'pokój', 'szczęście', 'podróż', 'miasto', 'wiadomości', 'wakacje', 'turystyka'
+	],
+	'Ukrainian': [
+    'яблуко', 'банан', 'апельсин', 'гітара', 'фантазія', 'гора', 'пригода', 'шепіт', 'сонце', 'дельфін',
+    'слон', 'свобода', 'льодовик', 'історія', 'подорож', 'кенгуру', 'бібліотека', 'русалка', 'зошит', 'океан',
+    'головоломка', 'пісок', 'веселка', 'зірка', 'скарб', 'парасолька', 'вулкан', 'водоспад', 'жирафа', 'смарагд',
+    'гарбуз', 'музика', 'школа', 'море', 'надія', 'ліжко', 'місто', 'друг', 'книга', 'площа',
+    'поет', 'учень', 'шоколад', 'місяць', 'перлина', 'корабель', 'лідер', 'мистецтво', 'фото', 'сміливий',
+    'тварина', 'вітер', 'світ', 'насіння', 'початок', 'лампа', 'окуляри', 'темрява', 'планета', 'риба',
+    'читання', 'літак', 'автомобіль', 'будинок', 'ліс', 'одяг', 'їжа', 'капелюх', 'сім\'я', 'фільм',
+    'м\'яч', 'гра', 'квіти', 'поїзд', 'велосипед', 'сад', 'озеро', 'річка', 'лікар', 'пілот',
+    'лисиця', 'театр', 'гори', 'пустеля', 'успіх', 'мистецтво', 'спорт', 'таємниця', 'історія', 'герой',
+    'парк', 'солодощі', 'свобода', 'мир', 'щастя', 'подорож', 'місто', 'новини', 'канікули', 'туризм'
+	],
+	'Malay': [
+    'epal', 'pisang', 'oren', 'gitar', 'fantasi', 'gunung', 'pengembaraan', 'bisikan', 'matahari', 'ikan lumba-lumba',
+    'gajah', 'kebebasan', 'glasier', 'sejarah', 'perjalanan', 'kanggaru', 'perpustakaan', 'duyung', 'buku nota', 'lautan',
+    'teka-teki', 'pasir', 'pelangi', 'bintang', 'harta karun', 'payung', 'gunung berapi', 'air terjun', 'zirafah', 'zamrud',
+    'labu', 'muzik', 'sekolah', 'laut', 'harapan', 'katil', 'bandar', 'rakan', 'buku', 'dataran',
+    'penyair', 'pelajar', 'coklat', 'bulan', 'mutiara', 'kapal', 'pemimpin', 'seni', 'gambar', 'berani',
+    'haiwan', 'angin', 'dunia', 'benih', 'permulaan', 'lampu', 'cermin mata', 'kegelapan', 'planet', 'ikan',
+    'bacaan', 'kapal terbang', 'kereta', 'rumah', 'hutan', 'pakaian', 'makanan', 'topi', 'keluarga', 'filem',
+    'bola', 'permainan', 'bunga', 'kereta api', 'basikal', 'taman', 'tasik', 'sungai', 'doktor', 'juruterbang',
+    'musang', 'teater', 'pergunungan', 'padang pasir', 'kejayaan', 'seni', 'sukan', 'rahsia', 'cerita', 'wira',
+    'taman', 'gula-gula', 'kebebasan', 'keamanan', 'kebahagiaan', 'perjalanan', 'bandar', 'berita', 'cuti', 'pelancongan'
+	],
+	'Dutch': [
+    'appel', 'banaan', 'sinaasappel', 'gitaar', 'fantasie', 'berg', 'avontuur', 'fluister', 'zon', 'dolfijn',
+    'olifant', 'vrijheid', 'gletsjer', 'geschiedenis', 'reis', 'kangoeroe', 'bibliotheek', 'zeemeermin', 'notitieboek', 'oceaan',
+    'puzzel', 'zand', 'regenboog', 'ster', 'schat', 'paraplu', 'vulkaan', 'waterval', 'giraf', 'smaragd',
+    'pompoen', 'muziek', 'school', 'zee', 'hoop', 'bed', 'stad', 'vriend', 'boek', 'plein',
+    'dichter', 'student', 'chocolade', 'maan', 'parel', 'schip', 'leider', 'kunst', 'foto', 'moedig',
+    'dier', 'wind', 'wereld', 'zaad', 'begin', 'lamp', 'bril', 'duisternis', 'planeet', 'vis',
+    'lezen', 'vliegtuig', 'auto', 'huis', 'bos', 'kleding', 'eten', 'hoed', 'familie', 'film',
+    'bal', 'spel', 'bloem', 'trein', 'fiets', 'tuin', 'meer', 'rivier', 'dokter', 'piloot',
+    'vos', 'theater', 'bergen', 'woestijn', 'succes', 'kunst', 'sport', 'geheim', 'verhaal', 'held',
+    'park', 'snoep', 'vrijheid', 'vrede', 'geluk', 'reis', 'stad', 'nieuws', 'vakantie', 'toerisme'
+	],
+	'Romanian': [
+    'măr', 'banană', 'portocală', 'chitară', 'fantezie', 'munte', 'aventură', 'șoaptă', 'soare', 'delfin',
+    'elefant', 'libertate', 'ghețar', 'istorie', 'călătorie', 'cangur', 'bibliotecă', 'sirena', 'caiet', 'ocean',
+    'puzzle', 'nisip', 'curcubeu', 'stea', 'comoară', 'umbrelă', 'vulcan', 'cascadă', 'girafă', 'smarald',
+    'dovleac', 'muzică', 'școală', 'mare', 'speranță', 'pat', 'oraș', 'prieten', 'carte', 'piață',
+    'poet', 'student', 'ciocolată', 'lună', 'perlă', 'navă', 'lider', 'artă', 'fotografie', 'curajos',
+    'animal', 'vânt', 'lume', 'semințe', 'început', 'lampă', 'ochelari', 'întuneric', 'planetă', 'pește',
+    'citit', 'avion', 'mașină', 'casă', 'pădure', 'haine', 'mâncare', 'pălărie', 'familie', 'film',
+    'minge', 'joc', 'floare', 'tren', 'bicicletă', 'grădină', 'lac', 'râu', 'doctor', 'pilot',
+    'vulpe', 'teatru', 'munți', 'deșert', 'succes', 'artă', 'sport', 'secret', 'poveste', 'erou',
+    'parc', 'dulciuri', 'libertate', 'pace', 'fericire', 'călătorie', 'oraș', 'știri', 'vacanță', 'turism'
+	],
+	'Kazakh': [
+    'алма', 'банан', 'апельсин', 'гитара', 'фантазия', 'тау', 'шытырман оқиға', 'сыбыр', 'күн', 'дельфин',
+    'піл', 'бостандық', 'мұздық', 'тарих', 'саяхат', 'кенгуру', 'кітапхана', 'су перісі', 'дәптер', 'мұхит',
+    'жұмбақ', 'құм', 'кемпірқосақ', 'жұлдыз', 'қазына', 'қолшатыр', 'жанартау', 'сарқырама', 'керік', 'зумруд',
+    'асқабақ', 'музыка', 'мектеп', 'теңіз', 'үміт', 'төсек', 'қала', 'дос', 'кітап', 'алаң',
+    'ақын', 'оқушы', 'шоколад', 'ай', 'інжу', 'кемеде', 'көшбасшы', 'өнер', 'фото', 'батыр',
+    'жануар', 'жел', 'әлем', 'тұқым', 'бастау', 'шам', 'көзілдірік', 'қараңғылық', 'планета', 'балық',
+    'оқу', 'ұшақ', 'көлік', 'үй', 'орман', 'киім', 'тамақ', 'бас киім', 'отбасы', 'фильм',
+    'доп', 'ойын', 'гүл', 'пойыз', 'велосипед', 'бақ', 'көл', 'өзен', 'дәрігер', 'ұшқыш',
+    'түлкі', 'театр', 'таулар', 'шөл', 'сәттілік', 'өнер', 'спорт', 'құпия', 'әңгіме', 'батыр',
+    'саябақ', 'кәмпит', 'бостандық', 'бейбітшілік', 'бақыт', 'саяхат', 'қала', 'жаңалықтар', 'демалыс', 'туризм'
+	],
+	'Hungarian': [
+    'alma', 'banán', 'narancs', 'gitár', 'fantázia', 'hegy', 'kaland', 'suttogás', 'nap', 'delfin',
+    'elefánt', 'szabadság', 'gleccser', 'történelem', 'utazás', 'kenguru', 'könyvtár', 'sellő', 'jegyzetfüzet', 'óceán',
+    'rejtvény', 'homok', 'szivárvány', 'csillag', 'kincs', 'esernyő', 'vulkán', 'vízesés', 'zsiráf', 'smaragd',
+    'tök', 'zene', 'iskola', 'tenger', 'remény', 'ágy', 'város', 'barát', 'könyv', 'tér',
+    'költő', 'diák', 'csokoládé', 'hold', 'gyöngy', 'hajó', 'vezető', 'művészet', 'fotó', 'bátor',
+    'állat', 'szél', 'világ', 'mag', 'kezdet', 'lámpa', 'szemüveg', 'sötétség', 'bolygó', 'hal',
+    'olvasás', 'repülőgép', 'autó', 'ház', 'erdő', 'ruházat', 'étel', 'kalap', 'család', 'film',
+    'labda', 'játék', 'virág', 'vonat', 'kerékpár', 'kert', 'tó', 'folyó', 'orvos', 'pilóta',
+    'róka', 'színház', 'hegyek', 'sivatag', 'siker', 'művészet', 'sport', 'titok', 'történet', 'hős',
+    'park', 'cukorka', 'szabadság', 'béke', 'boldogság', 'utazás', 'város', 'hírek', 'nyaralás', 'turizmus'
+	],
+	'Cebuano': [
+    'mansanas', 'saging', 'oranges', 'gitar', 'fantasya', 'bukid', 'adventure', 'whisper', 'adlaw', 'lumba-lumba',
+    'elepante', 'kagawasan', 'glacier', 'kasaysayan', 'pagbiyahe', 'kangaroo', 'library', 'sirena', 'notebook', 'dagat',
+    'puzzle', 'balas', 'balangaw', 'bituon', 'bahandi', 'payong', 'bulkan', 'busay', 'balanghoy', 'esmeralda',
+    'kalabasa', 'musika', 'eskuylahan', 'dagat', 'paglaum', 'higdaanan', 'syudad', 'higala', 'libro', 'kwadrado',
+    'magsusulat', 'estudyante', 'tsokolate', 'bulan', 'perlas', 'barko', 'lider', 'arte', 'litrato', 'maisugon',
+    'hayop', 'hangin', 'kalibutan', 'binhi', 'pagsugod', 'lampara', 'salamin', 'kangitngit', 'planeta', 'isda',
+    'pagbasa', 'eroplano', 'awto', 'balay', 'lasang', 'sinina', 'pagkaon', 'sombrero', 'pamilya', 'sine',
+    'bola', 'dula', 'bulak', 'tren', 'bisikleta', 'hardin', 'lanaw', 'sapa', 'doktor', 'piloto',
+    'soro', 'teatro', 'bukid', 'disyerto', 'kalampusan', 'arte', 'isport', 'sekreto', 'istorya', 'bayani',
+    'park', 'kendi', 'kagawasan', 'kalinaw', 'kalipay', 'biyahe', 'syudad', 'balita', 'bakasyon', 'turismo'
+	],
+	'Tagalog': [
+    'mansanas', 'saging', 'kahel', 'gitara', 'fantasya', 'bundok', 'pakikipagsapalaran', 'bulong', 'araw', 'dolphin',
+    'elepante', 'kalayaan', 'glacier', 'kasaysayan', 'paglalakbay', 'kangaroo', 'aklatan', 'sirena', 'notebook', 'karagatan',
+    'puzzle', 'buhangin', 'bahaghari', 'bituin', 'kayamanan', 'payong', 'bulkan', 'talon', 'giraffe', 'esmeralda',
+    'kalabasa', 'musika', 'paaralan', 'dagat', 'pag-asa', 'kama', 'lungsod', 'kaibigan', 'aklat', 'plaza',
+    'makata', 'mag-aaral', 'tsokolate', 'buwan', 'perlas', 'barko', 'pinuno', 'sining', 'larawan', 'matapang',
+    'hayop', 'hangin', 'mundo', 'binhi', 'simula', 'lampara', 'salamin', 'dilim', 'planeta', 'isda',
+    'pagbasa', 'eroplano', 'kotse', 'bahay', 'gubat', 'damit', 'pagkain', 'sumbrero', 'pamilya', 'pelikula',
+    'bola', 'laro', 'bulaklak', 'tren', 'bisikleta', 'hardin', 'lawa', 'ilog', 'doktor', 'piloto',
+    'soro', 'teatro', 'bundok', 'disyerto', 'tagumpay', 'sining', 'palakasan', 'lihim', 'kwento', 'bayani',
+    'park', 'kendi', 'kalayaan', 'kapayapaan', 'kaligayahan', 'paglalakbay', 'lungsod', 'balita', 'bakasyon', 'turismo'
+	],
+	'Greek': [
+    'μήλο', 'μπανάνα', 'πορτοκάλι', 'κιθάρα', 'φαντασία', 'βουνό', 'περιπέτεια', 'ψίθυρος', 'ήλιος', 'δελφίνι',
+    'ελέφαντας', 'ελευθερία', 'παγετώνας', 'ιστορία', 'ταξίδι', 'καγκουρό', 'βιβλιοθήκη', 'γοργόνα', 'σημειωματάριο', 'ωκεανός',
+    'παζλ', 'άμμος', 'ουράνιο τόξο', 'αστέρι', 'θησαυρός', 'ομπρέλα', 'ηφαίστειο', 'καταρράκτης', 'καμηλοπάρδαλη', 'σμαράγδι',
+    'κολοκύθα', 'μουσική', 'σχολείο', 'θάλασσα', 'ελπίδα', 'κρεβάτι', 'πόλη', 'φίλος', 'βιβλίο', 'πλατεία',
+    'ποιητής', 'μαθητής', 'σοκολάτα', 'φεγγάρι', 'μαργαριτάρι', 'πλοίο', 'ηγέτης', 'τέχνη', 'φωτογραφία', 'θαρραλέος',
+    'ζώο', 'άνεμος', 'κόσμος', 'σπόρος', 'αρχή', 'λάμπα', 'γυαλιά', 'σκοτάδι', 'πλανήτης', 'ψάρι',
+    'ανάγνωση', 'αεροπλάνο', 'αυτοκίνητο', 'σπίτι', 'δάσος', 'ρούχα', 'φαγητό', 'καπέλο', 'οικογένεια', 'ταινία',
+    'μπάλα', 'παιχνίδι', 'λουλούδι', 'τρένο', 'ποδήλατο', 'κήπος', 'λίμνη', 'ποτάμι', 'γιατρός', 'πιλότος',
+    'αλεπού', 'θέατρο', 'βουνά', 'έρημος', 'επιτυχία', 'τέχνη', 'αθλητισμός', 'μυστικό', 'ιστορία', 'ήρωας',
+    'πάρκο', 'γλυκά', 'ελευθερία', 'ειρήνη', 'ευτυχία', 'ταξίδι', 'πόλη', 'ειδήσεις', 'διακοπές', 'τουρισμός'
+	],
+	'Swedish': [
+    'äpple', 'banan', 'apelsin', 'gitarr', 'fantasi', 'berg', 'äventyr', 'viskning', 'sol', 'delfin',
+    'elefant', 'frihet', 'glaciär', 'historia', 'resa', 'känguru', 'bibliotek', 'sjöjungfru', 'anteckningsbok', 'hav',
+    'pussel', 'sand', 'regnbåge', 'stjärna', 'skatt', 'paraply', 'vulkan', 'vattenfall', 'giraff', 'smaragd',
+    'pumpa', 'musik', 'skola', 'hav', 'hopp', 'säng', 'stad', 'vän', 'bok', 'torg',
+    'poet', 'student', 'choklad', 'måne', 'pärla', 'skepp', 'ledare', 'konst', 'foto', 'modig',
+    'djur', 'vind', 'värld', 'frö', 'början', 'lampa', 'glasögon', 'mörker', 'planet', 'fisk',
+    'läsning', 'flygplan', 'bil', 'hus', 'skog', 'kläder', 'mat', 'hatt', 'familj', 'film',
+    'boll', 'spel', 'blomma', 'tåg', 'cykel', 'trädgård', 'sjö', 'flod', 'läkare', 'pilot',
+    'räv', 'teater', 'berg', 'öken', 'framgång', 'konst', 'sport', 'hemlighet', 'berättelse', 'hjälte',
+    'park', 'godis', 'frihet', 'fred', 'lycka', 'resa', 'stad', 'nyheter', 'semester', 'turism'
+	],
+	'Danish': [
+    'æble', 'banan', 'appelsin', 'guitar', 'fantasi', 'bjerg', 'eventyr', 'hvisken', 'sol', 'delfin',
+    'elefant', 'frihed', 'gletsjer', 'historie', 'rejse', 'kænguru', 'bibliotek', 'havfrue', 'notebook', 'hav',
+    'puslespil', 'sand', 'regnbue', 'stjerne', 'skat', 'paraply', 'vulkan', 'vandfald', 'giraf', 'smaragd',
+    'græskar', 'musik', 'skole', 'havet', 'håb', 'seng', 'by', 'ven', 'bog', 'plads',
+    'digter', 'studerende', 'chokolade', 'måne', 'perle', 'skib', 'leder', 'kunst', 'billede', 'modig',
+    'dyr', 'vind', 'verden', 'frø', 'begyndelse', 'lampe', 'briller', 'mørke', 'planet', 'fisk',
+    'læsning', 'flyvemaskine', 'bil', 'hus', 'skov', 'tøj', 'mad', 'hat', 'familie', 'film',
+    'bold', 'spil', 'blomst', 'tog', 'cykel', 'have', 'sø', 'flod', 'læge', 'pilot',
+    'ræv', 'teater', 'bjerge', 'ørken', 'succes', 'kunst', 'sport', 'hemmelighed', 'historie', 'helt',
+    'park', 'slik', 'frihed', 'fred', 'lykke', 'rejse', 'by', 'nyheder', 'ferie', 'turisme'
+	],
+	'Finnish': [
+    'omena', 'banaani', 'appelsiini', 'kitara', 'fantasia', 'vuori', 'seikkailu', 'kuiskaus', 'aurinko', 'delfiini',
+    'norsu', 'vapaus', 'jäätikkö', 'historia', 'matka', 'kenguru', 'kirjasto', 'merenneito', 'muistikirja', 'valtameri',
+    'palapeli', 'hiekka', 'sateenkaari', 'tähti', 'aarre', 'sateenvarjo', 'tulivuori', 'vesiputous', 'kirahvi', 'smaragdi',
+    'kurpitsa', 'musiikki', 'koulu', 'meri', 'toivo', 'sänky', 'kaupunki', 'ystävä', 'kirja', 'aukio',
+    'runoilija', 'opiskelija', 'suklaa', 'kuu', 'helmi', 'laiva', 'johtaja', 'taide', 'valokuva', 'rohkea',
+    'eläin', 'tuuli', 'maailma', 'siemen', 'alku', 'lamppu', 'lasit', 'pimeys', 'planeetta', 'kala',
+    'lukeminen', 'lentokone', 'auto', 'talo', 'metsä', 'vaatteet', 'ruoka', 'hattu', 'perhe', 'elokuva',
+    'pallo', 'peli', 'kukka', 'juna', 'polkupyörä', 'puutarha', 'järvi', 'joki', 'lääkäri', 'lentäjä',
+    'kettu', 'teatteri', 'vuoret', 'aavikko', 'menestys', 'taide', 'urheilu', 'salaisuus', 'tarina', 'sankari',
+    'puisto', 'karkki', 'vapaus', 'rauha', 'onni', 'matka', 'kaupunki', 'uutiset', 'loma', 'turismi'
+	],
+	'Hebrew': [
+    'תפוח', 'בננה', 'תפוז', 'גיטרה', 'פנטזיה', 'הר', 'הרפתקה', 'לחישה', 'שמש', 'דולפין',
+    'פיל', 'חירות', 'קרחון', 'היסטוריה', 'מסע', 'קנגורו', 'ספרייה', 'בת ים', 'מחברת', 'אוקיינוס',
+    'פאזל', 'חול', 'קשת', 'כוכב', 'אוצר', 'מטריה', 'הר געש', 'מפל', 'ג’ירפה', 'אזמרגד',
+    'דלעת', 'מוזיקה', 'בית ספר', 'ים', 'תקווה', 'מיטה', 'עיר', 'חבר', 'ספר', 'כיכר',
+    'משורר', 'תלמיד', 'שוקולד', 'ירח', 'פנינה', 'ספינה', 'מנהיג', 'אמנות', 'צילום', 'אמיץ',
+    'בעל חיים', 'רוח', 'עולם', 'זרע', 'התחלה', 'מנורה', 'משקפיים', 'חושך', 'כוכב לכת', 'דג',
+    'קריאה', 'מטוס', 'מכונית', 'בית', 'יער', 'בגדים', 'אוכל', 'כובע', 'משפחה', 'סרט',
+    'כדור', 'משחק', 'פרח', 'רכבת', 'אופניים', 'גן', 'אגם', 'נהר', 'רופא', 'טייס',
+    'שועל', 'תיאטרון', 'הרים', 'מדבר', 'הצלחה', 'אמנות', 'ספורט', 'סוד', 'סיפור', 'גיבור',
+    'פארק', 'ממתקים', 'חירות', 'שלום', 'אושר', 'מסע', 'עיר', 'חדשות', 'חופשה', 'תיירות'
+	],
+	'Norwegian': [
+    'eple', 'banan', 'appelsin', 'gitar', 'fantasi', 'fjell', 'eventyr', 'hvisking', 'sol', 'delfin',
+    'elefant', 'frihet', 'isbre', 'historie', 'reise', 'kenguru', 'bibliotek', 'havfrue', 'notatbok', 'hav',
+    'puslespill', 'sand', 'regnbue', 'stjerne', 'skatt', 'paraply', 'vulkan', 'foss', 'sjiraff', 'smaragd',
+    'gresskar', 'musikk', 'skole', 'sjø', 'håp', 'seng', 'by', 'venn', 'bok', 'torg',
+    'poet', 'student', 'sjokolade', 'måne', 'perle', 'skip', 'leder', 'kunst', 'bilde', 'modig',
+    'dyr', 'vind', 'verden', 'frø', 'begynnelse', 'lampe', 'briller', 'mørke', 'planet', 'fisk',
+    'lesing', 'fly', 'bil', 'hus', 'skog', 'klær', 'mat', 'hatt', 'familie', 'film',
+    'ball', 'spill', 'blomst', 'tog', 'sykkel', 'hage', 'innsjø', 'elv', 'lege', 'pilot',
+    'rev', 'teater', 'fjell', 'ørken', 'suksess', 'kunst', 'sport', 'hemmelighet', 'historie', 'helt',
+    'park', 'godteri', 'frihet', 'fred', 'lykke', 'reise', 'by', 'nyheter', 'ferie', 'turisme'
+	],
+	'Serbian': [
+    'јабука', 'банана', 'поморанџа', 'гитара', 'фантазија', 'планина', 'авантура', 'шапат', 'сунце', 'делфин',
+    'слон', 'слобода', 'глечер', 'историја', 'путовање', 'кенгур', 'библиотека', 'сирена', 'свеска', 'океан',
+    'слагалица', 'песак', 'дуга', 'звезда', 'благо', 'кишобран', 'вулкан', 'водопад', 'жирафа', 'смарагд',
+    'бундева', 'музика', 'школа', 'море', 'нада', 'кревет', 'град', 'пријатељ', 'књига', 'трг',
+    'песник', 'ученик', 'чоколада', 'месец', 'бисер', 'брод', 'лидер', 'уметност', 'фотографија', 'храбар',
+    'животиња', 'ветар', 'свет', 'семе', 'почетак', 'лампа', 'наочаре', 'тама', 'планета', 'риба',
+    'читање', 'авион', 'аутомобил', 'кућа', 'шума', 'одећа', 'храна', 'шешир', 'породица', 'филм',
+    'лопта', 'игра', 'цвет', 'воз', 'бицикл', 'врт', 'језеро', 'река', 'лекар', 'пилот',
+    'лисац', 'позориште', 'планине', 'пустиња', 'успех', 'уметност', 'спорт', 'тајна', 'прича', 'херој',
+    'парк', 'слаткиш', 'слобода', 'мир', 'срећа', 'путовање', 'град', 'вести', 'одмор', 'туризам'
+	],
+	'Czech': [
+    'jablko', 'banán', 'pomeranč', 'kytara', 'fantazie', 'hora', 'dobrodružství', 'šepot', 'slunce', 'delfín',
+    'slon', 'svoboda', 'ledovec', 'historie', 'cesta', 'klokan', 'knihovna', 'mořská panna', 'sešit', 'oceán',
+    'puzzle', 'písek', 'duha', 'hvězda', 'poklad', 'deštník', 'sopka', 'vodopád', 'žirafa', 'smaragd',
+    'dýně', 'hudba', 'škola', 'moře', 'naděje', 'postel', 'město', 'přítel', 'kniha', 'náměstí',
+    'básník', 'student', 'čokoláda', 'měsíc', 'perla', 'loď', 'vůdce', 'umění', 'fotografie', 'odvážný',
+    'zvíře', 'vítr', 'svět', 'semeno', 'začátek', 'lampa', 'brýle', 'tma', 'planeta', 'ryba',
+    'čtení', 'letadlo', 'auto', 'dům', 'les', 'oblečení', 'jídlo', 'klobouk', 'rodina', 'film',
+    'míč', 'hra', 'květina', 'vlak', 'kolo', 'zahrada', 'jezero', 'řeka', 'lékař', 'pilot',
+    'liška', 'divadlo', 'hory', 'poušť', 'úspěch', 'umění', 'sport', 'tajemství', 'příběh', 'hrdina',
+    'park', 'bonbóny', 'svoboda', 'mír', 'štěstí', 'cesta', 'město', 'zprávy', 'dovolená', 'turismus'
+	],
+	'Slovak': [
+    'jablko', 'banán', 'pomaranč', 'gitara', 'fantázia', 'hora', 'dobrodružstvo', 'šepot', 'slnko', 'delfín',
+    'slon', 'sloboda', 'ľadovec', 'história', 'cesta', 'klokan', 'knižnica', 'morská panna', 'zošit', 'oceán',
+    'puzzle', 'piesok', 'dúha', 'hviezda', 'poklad', 'dáždnik', 'sopka', 'vodopád', 'žirafa', 'smaragd',
+    'tekvica', 'hudba', 'škola', 'more', 'nádej', 'posteľ', 'mesto', 'priateľ', 'kniha', 'námestie',
+    'básnik', 'študent', 'čokoláda', 'mesiac', 'perla', 'loď', 'vodca', 'umenie', 'fotografia', 'odvážny',
+    'zviera', 'vietor', 'svet', 'semeno', 'začiatok', 'lampa', 'okuliare', 'tma', 'planéta', 'ryba',
+    'čítanie', 'lietadlo', 'auto', 'dom', 'les', 'oblečenie', 'jedlo', 'klobúk', 'rodina', 'film',
+    'lopta', 'hra', 'kvet', 'vlak', 'bicykel', 'záhrada', 'jazero', 'rieka', 'lekár', 'pilot',
+    'líška', 'divadlo', 'hory', 'púšť', 'úspech', 'umenie', 'šport', 'tajomstvo', 'príbeh', 'hrdina',
+    'park', 'cukríky', 'sloboda', 'mier', 'šťastie', 'cesta', 'mesto', 'správy', 'dovolenka', 'turizmus'
+	],
+	'Bulgarian': [
+    'ябълка', 'банан', 'портокал', 'китара', 'фантазия', 'планина', 'приключение', 'шепот', 'слънце', 'делфин',
+    'слон', 'свобода', 'ледник', 'история', 'пътуване', 'кенгуру', 'библиотека', 'русалка', 'тетрадка', 'океан',
+    'пъзел', 'пясък', 'дъга', 'звезда', 'съкровище', 'чадър', 'вулкан', 'водопад', 'жираф', 'смарагд',
+    'тиква', 'музика', 'училище', 'море', 'надежда', 'легло', 'град', 'приятел', 'книга', 'площад',
+    'поет', 'ученик', 'шоколад', 'луна', 'перла', 'кораб', 'лидер', 'изкуство', 'снимка', 'смел',
+    'животно', 'вятър', 'свят', 'семе', 'начало', 'лампа', 'очила', 'мрак', 'планета', 'риба',
+    'четене', 'самолет', 'кола', 'къща', 'гора', 'дрехи', 'храна', 'шапка', 'семейство', 'филм',
+    'топка', 'игра', 'цвете', 'влак', 'колело', 'градина', 'езеро', 'река', 'лекар', 'пилот',
+    'лисица', 'театър', 'планини', 'пустиня', 'успех', 'изкуство', 'спорт', 'тайна', 'история', 'герой',
+    'парк', 'бонбони', 'свобода', 'мир', 'щастие', 'пътуване', 'град', 'новини', 'почивка', 'туризъм'
+	],
+	'Croatian': [
+    'jabuka', 'banana', 'naranča', 'gitara', 'fantazija', 'planina', 'avantura', 'šapat', 'sunce', 'dupina',
+    'slon', 'sloboda', 'ledenjak', 'povijest', 'putovanje', 'klokan', 'knjižnica', 'sirena', 'bilježnica', 'ocean',
+    'zagonetka', 'pijesak', 'duga', 'zvijezda', 'blago', 'kišobran', 'vulkan', 'slap', 'žirafa', 'smaragd',
+    'bundeva', 'glazba', 'škola', 'more', 'nada', 'krevet', 'grad', 'prijatelj', 'knjiga', 'trg',
+    'pjesnik', 'student', 'čokolada', 'mjesec', 'biser', 'brod', 'vođa', 'umjetnost', 'fotografija', 'hrabar',
+    'životinja', 'vjetar', 'svijet', 'sjeme', 'početak', 'svjetiljka', 'naočale', 'tama', 'planet', 'riba',
+    'čitanje', 'zrakoplov', 'automobil', 'kuća', 'šuma', 'odjeća', 'hrana', 'šešir', 'obitelj', 'film',
+    'lopta', 'igra', 'cvijet', 'vlak', 'bicikl', 'vrt', 'jezero', 'rijeka', 'liječnik', 'pilot',
+    'lisica', 'kazalište', 'planine', 'pustinja', 'uspjeh', 'umjetnost', 'sport', 'tajna', 'priča', 'heroj',
+    'park', 'slatkiši', 'sloboda', 'mir', 'sreća', 'putovanje', 'grad', 'vijesti', 'odmor', 'turizam'
+	],
+	'Belarusian': [
+    'яблык', 'банан', 'апельсін', 'гітара', 'фантазія', 'гара', 'прыгода', 'шэпт', 'сонца', 'дэльфін',
+    'слон', 'свабода', 'ледавік', 'гісторыя', 'падарожжа', 'кенгуру', 'бібліятэка', 'русалка', 'нататнік', 'акіян',
+    'галаваломка', 'пясок', 'вясёлка', 'зорка', 'скарб', 'парасон', 'вулкан', 'вадапад', 'жыраф', 'смарагд',
+    'гарбуз', 'музыка', 'школа', 'мора', 'надзея', 'ложак', 'горад', 'сябар', 'кніга', 'плошча',
+    'паэт', 'студэнт', 'шакалад', 'месяц', 'жамчужына', 'карабель', 'лідар', 'мастацтва', 'фота', 'смелы',
+    'жывёла', 'вецер', 'свет', 'насенне', 'пачатак', 'лямпа', 'акуляры', 'цемра', 'планета', 'рыба',
+    'чытанне', 'самалёт', 'аўтамабіль', 'дом', 'лес', 'адзенне', 'ежа', 'капялюш', 'сям’я', 'фільм',
+    'мяч', 'гульня', 'кветка', 'цягнік', 'веласіпед', 'сад', 'возера', 'рака', 'лекар', 'пілот',
+    'ліс', 'тэатр', 'горы', 'пустыня', 'поспех', 'мастацтва', 'спорт', 'сакрэт', 'гісторыя', 'герой',
+    'парк', 'салодкае', 'свабода', 'мір', 'шчасце', 'падарожжа', 'горад', 'навіны', 'адпачынак', 'турызм'
+	],
+	'Lithuanian': [
+    'obuolys', 'bananas', 'apelsinas', 'gitara', 'fantazija', 'kalnas', 'nuotykis', 'šnabždesys', 'saulė', 'delfinas',
+    'dramblys', 'laisvė', 'ledynas', 'istorija', 'kelionė', 'kengūra', 'biblioteka', 'undinė', 'užrašų knygelė', 'vandenynas',
+    'dėlionė', 'smėlis', 'vaivorykštė', 'žvaigždė', 'lobis', 'skėtis', 'ugnikalnis', 'krioklys', 'žirafa', 'smaragdas',
+    'moliūgas', 'muzika', 'mokykla', 'jūra', 'viltis', 'lova', 'miestas', 'draugas', 'knyga', 'aikštė',
+    'poetas', 'studentas', 'šokoladas', 'mėnulis', 'perlas', 'laivas', 'lyderis', 'menas', 'nuotrauka', 'drąsus',
+    'gyvūnas', 'vėjas', 'pasaulis', 'sėkla', 'pradžia', 'lempa', 'akiniai', 'tamsa', 'planeta', 'žuvis',
+    'skaitymas', 'lėktuvas', 'automobilis', 'namas', 'miškas', 'drabužiai', 'maistas', 'kepurė', 'šeima', 'filmas',
+    'kamuolys', 'žaidimas', 'gėlė', 'traukinys', 'dviratis', 'sodas', 'ežeras', 'upė', 'gydytojas', 'pilot',
+    'lapė', 'teatras', 'kalnai', 'dykuma', 'sėkmė', 'menas', 'sporto', 'paslaptis', 'istorija', 'herojus',
+    'parkas', 'saldainiai', 'laisvė', 'taika', 'laimė', 'kelionė', 'miestas', 'naujienos', 'atostogos', 'turizmas'
+	],
+	'Latvian': [
+    'ābols', 'banāns', 'apelsīns', 'ģitāra', 'fantāzija', 'kalns', 'piedzīvojums', 'čuksts', 'saule', 'delfīns',
+    'zilonis', 'brīvība', 'ledājs', 'vēsture', 'ceļojums', 'ķengurs', 'bibliotēka', 'nāriņa', 'piezīmju grāmata', 'okeāns',
+    'puzle', 'smiltis', 'varavīksne', 'zvaigzne', 'dārgums', 'lietusmētelis', 'vulkāns', 'ūdens kritums', 'žirafe', 'smaragds',
+    'ķirbis', 'mūzika', 'skola', 'jūra', 'cerība', 'gulta', 'pilsēta', 'draugs', 'grāmata', 'laukums',
+    'dzejnieks', 'students', 'šokolāde', 'mēness', 'pērle', 'kuģis', 'līderis', 'māksla', 'fotogrāfija', 'drosmīgs',
+    'dzīvnieks', 'vējš', 'pasaule', 'sēkla', 'sākums', 'lampa', 'brilles', 'tumsa', 'planēta', 'zivs',
+    'lasīšana', 'lidmašīna', 'automobilis', 'māja', 'mežs', 'apģērbs', 'ēdiens', 'cepure', 'ģimene', 'filma',
+    'bumba', 'spēle', 'zieds', 'vilciens', 'velosipēds', 'dārzs', 'ezers', 'upe', 'ārsts', 'pilots',
+    'lapsa', 'teātris', 'kalni', 'tuksnesis', 'panākumi', 'māksla', 'sports', 'noslēpums', 'stāsts', 'varonis',
+    'parks', 'konfektes', 'brīvība', 'miers', 'laime', 'ceļojums', 'pilsēta', 'ziņas', 'brīvdienas', 'tūrisms'
+	],
+	'Estonian': [
+    'õun', 'banaan', 'apelsin', 'kitarr', 'fantaasia', 'mägi', 'seiklus', 'whisper', 'päike', 'delfiin',
+    'elevant', 'vabadus', 'liustik', 'ajalugu', 'reis', 'känguru', 'raamatukogu', 'merineitsi', 'märkmik', 'ookean',
+    'pusle', 'liiv', 'vikerkaar', 'täht', 'aare', 'vihmavari', 'vulkaan', 'juga', 'kaelkirjak', 'smaragd',
+    'kõrvits', 'muusika', 'kool', 'meri', 'lootus', 'voodi', 'linn', 'sõber', 'raamat', 'väljak',
+    'luuletaja', 'õpilane', 'šokolaad', 'kuu', 'pärl', 'laev', 'juht', 'kunst', 'foto', 'julge',
+    'loom', 'tuul', 'maailm', 'seeme', 'algus', 'lamp', 'prillid', 'pimedus', 'planeet', 'kala',
+    'lugemine', 'lennuk', 'auto', 'maja', 'mets', 'riided', 'toit', 'müts', 'perekond', 'film',
+    'pall', 'mäng', 'lill', 'rong', 'jalgratas', 'aed', 'järv', 'jõgi', 'arst', 'piloot',
+    'rebane', 'teater', 'mäed', 'kõrb', 'edu', 'kunst', 'sport', 'saladus', 'lugu', 'kangelane',
+    'park', 'kommid', 'vabadus', 'rahu', 'õnn', 'reis', 'linn', 'uudised', 'puhkus', 'turism'
+	],
+	'Afrikaans': [
+    'appel', 'banaan', 'lemoen', 'kitaar', 'fantasie', 'berg', 'avontuur', 'fluister', 'son', 'dolfyn',
+    'olifant', 'vryheid', 'gletser', 'geskiedenis', 'reis', 'kangaroe', 'biblioteek', 'meermin', 'notaboek', 'oseaan',
+    'legkaart', 'sand', 'reënboog', 'ster', 'skat', 'sambreel', 'vulkaan', 'waterval', 'kameelperd', 'smarag',
+    'pampoen', 'musiek', 'skool', 'see', 'hoop', 'bed', 'stad', 'vriend', 'boek', 'plein',
+    'digter', 'student', 'sjokolade', 'maan', 'pêrel', 'skip', 'leier', 'kuns', 'foto', 'dapper',
+    'dier', 'wind', 'wêreld', 'saad', 'begin', 'lamp', 'bril', 'donkerte', 'planeet', 'vis',
+    'lees', 'vliegtuig', 'motor', 'huis', 'woud', 'klere', 'kos', 'hoed', 'familie', 'film',
+    'bal', 'spel', 'blom', 'trein', 'fiets', 'tuin', 'meer', 'rivier', 'dokter', 'vlieënier',
+    'jakkals', 'teater', 'berge', 'woestyn', 'sukses', 'kuns', 'sport', 'geheim', 'verhaal', 'held',
+    'park', 'lekkergoed', 'vryheid', 'vrede', 'geluk', 'reis', 'stad', 'nuus', 'vakansie', 'toerisme'
+	],
+	'Icelandic': [
+    'epli', 'banani', 'appelsína', 'gítar', 'fantasía', 'fjall', 'ævintýri', 'hvísla', 'sól', 'höfrungur',
+    'fíll', 'frelsi', 'jökull', 'saga', 'ferðalag', 'kengúra', 'bókasafn', 'hafmeyja', 'minnisbók', 'haf',
+    'púsl', 'sandur', 'regnbogi', 'stjarna', 'fjársjóður', 'regnhlíf', 'eldfjall', 'foss', 'gíraffi', 'smaragður',
+    'grasker', 'tónlist', 'skóli', 'sjór', 'von', 'rúm', 'borg', 'vinur', 'bók', 'torg',
+    'skáld', 'nemandi', 'súkkulaði', 'tungl', 'perla', 'skip', 'leiðtogi', 'list', 'mynd', 'hugrakkur',
+    'dýr', 'vindur', 'heimur', 'fræ', 'byrjun', 'lampi', 'gleraugu', 'myrkur', 'pláneta', 'fiskur',
+    'lestur', 'flugvél', 'bíll', 'hús', 'skógur', 'föt', 'matur', 'hattur', 'fjölskylda', 'kvikmynd',
+    'bolti', 'leikur', 'blóm', 'lest', 'hjól', 'garður', 'vatn', 'á', 'læknir', 'flugmaður',
+    'refur', 'leikhús', 'fjöll', 'eyðimörk', 'árangur', 'list', 'íþrótt', 'leyndarmál', 'saga', 'hetja',
+    'garður', 'nammi', 'frelsi', 'frið', 'hamingja', 'ferðalag', 'borg', 'fréttir', 'frí', 'ferðamennska'
+	],
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+};

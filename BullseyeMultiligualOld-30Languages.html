@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circles Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        canvas {
+            margin-top: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .bullseye {
+            margin-top: 20px;
+            background-color: white;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #controls {
+            margin-top: 20px;
+        }
+
+        #wordDisplay {
+            font-size: 24px;
+            letter-spacing: 10px;
+        }
+
+        .slider-container {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .controls-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .canvas-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Circles Game</h1>
+
+<div class="controls-container">
+    <!-- Language Selection -->
+    <div>
+        <label for="language">Select Language:</label>
+        <select id="language">
+    <option value="en">English</option>
+    <option value="es">Spanish</option>
+    <option value="zh">Chinese</option>
+    <option value="hi">Hindi</option>
+    <option value="ar">Arabic</option>
+    <option value="pt">Portuguese</option>
+    <option value="ru">Russian</option>
+    <option value="fr">French</option>
+    <option value="ko">Korean</option>
+    <option value="ja">Japanese</option>
+    <option value="el">Greek</option>
+    <option value="he">Hebrew</option>
+    <option value="th">Thai</option>
+    <option value="tr">Turkish</option>
+    <option value="vi">Vietnamese</option>
+    <option value="pl">Polish</option>
+    <option value="nl">Dutch</option>
+    <option value="sv">Swedish</option>
+    <option value="it">Italian</option>
+    <option value="fi">Finnish</option>
+    <option value="no">Norwegian</option>
+    <option value="da">Danish</option>
+    <option value="cs">Czech</option>
+    <option value="hu">Hungarian</option>
+    <option value="bg">Bulgarian</option>
+    <option value="ro">Romanian</option>
+    <option value="id">Indonesian</option>
+    <option value="ms">Malay</option>
+    <option value="sw">Swahili</option>
+    <option value="uk">Ukrainian</option>
+            <!-- Add other languages here -->
+        </select>
+    </div>
+
+    <!-- Player Selection -->
+    <div style="margin-top: 10px;">
+        <label for="players">Number of Players:</label>
+        <select id="players">
+            <option value="1">Single Player</option>
+            <option value="2">Two Players</option>
+        </select>
+    </div>
+</div>
+
+<!-- Wrong Answer Slider -->
+<div class="slider-container">
+    <p>Wrong answers allowed: <span id="wrongAnswersCount">6</span></p>
+    <input type="range" id="wrongAnswersSlider" min="1" max="10" value="6">
+</div>
+
+<!-- Word Input for Two Players -->
+<div id="twoPlayerInput" style="display: none; margin-top: 10px;">
+    <p>Player 1: Enter a word for Player 2 to guess:</p>
+    <input type="text" id="player1Word" placeholder="Enter word">
+</div>
+
+<!-- Start Game Button -->
+<button id="startButton" style="margin-top: 10px;" onclick="startGame()">Start Game</button>
+
+<!-- Canvas for Bullseye Drawing -->
+<div class="canvas-container">
+    <canvas id="bullseye" class="bullseye" width="300" height="300"></canvas>
+</div>
+
+<!-- Displaying the Word -->
+<p id="wordDisplay"></p>
+
+<!-- User Input for Guessing Letters -->
+<div id="guessSection" style="display: none;">
+    <input type="text" id="letterInput" maxlength="1" placeholder="Guess a letter">
+    <button onclick="guessLetter()">Guess</button>
+</div>
+
+<script>
+// Default Word Lists for languages
+const wordLists = {
+    'en': [
+        'apple', 'banana', 'orange', 'guitar', 'fantasy', 'mountain', 'adventure', 'whisper', 'sunshine', 'dolphin', 
+        'elephant', 'freedom', 'glacier', 'history', 'journey', 'kangaroo', 'library', 'mermaid', 'notebook', 'oceanic',
+        'puzzle', 'quicksand', 'rainbow', 'starlight', 'treasure', 'umbrella', 'volcano', 'waterfall', 'xylophone', 
+        'yellowish', 'zebra', 'backpack', 'coconut', 'diameter', 'engineer', 'firework', 'grateful', 'holiday', 'internet', 
+        'jungle', 'knight', 'laughter', 'mystery', 'nostalgia', 'octopus', 'penguin', 'quality', 'radiator', 'sapphire', 
+        'telescope', 'umbrella', 'velocity', 'whistle', 'xenophobia', 'yearbook', 'zephyr', 'balloon', 'compass', 
+        'discovery', 'education', 'flamingo', 'goldfish', 'harmony', 'island', 'jasmine', 'knowledge', 'landscape', 
+        'mountaineer', 'nostalgic', 'octagonal', 'pacific', 'quietness', 'rosemary', 'seahorse', 'tornado', 'utopia', 
+        'volleyball', 'whirlpool', 'xylophonist', 'yellowtail', 'zoologist', 'beverage', 'clarity', 'dragonfly', 
+        'eclipse', 'flourish', 'gravity', 'hurricane', 'iceberg', 'jaguar', 'koala', 'leopard', 'mineral', 'nebula', 
+        'orchestra', 'paradise', 'quirky', 'riddle', 'serenity', 'tsunami', 'universe', 'victorious'
+    ],
+    'es': [
+        'manzana', 'platano', 'naranja', 'guitarra', 'fantasia', 'montana', 'aventura', 'susurro', 'sol', 'delfin', 
+        'elefante', 'libertad', 'glaciar', 'historia', 'viaje', 'canguro', 'biblioteca', 'sirena', 'cuaderno', 'oceanico',
+        'rompecabezas', 'arena', 'arcoiris', 'estrella', 'tesoro', 'paraguas', 'volcan', 'cascada', 'xilofono', 
+        'amarillo', 'cebra', 'mochila', 'coco', 'diametro', 'ingeniero', 'fuegos', 'agradecido', 'vacaciones', 'internet', 
+        'selva', 'caballero', 'risa', 'misterio', 'nostalgia', 'pulpo', 'pingüino', 'calidad', 'radiador', 'zafiro', 
+        'telescopio', 'paraguas', 'velocidad', 'silbar', 'xenofobia', 'anuario', 'céfiro', 'globo', 'brújula', 
+        'descubrimiento', 'educacion', 'flamenco', 'pez', 'armonía', 'isla', 'jazmín', 'conocimiento', 'paisaje', 
+        'alpinista', 'nostálgico', 'octagonal', 'pacifico', 'tranquilidad', 'romero', 'caballito', 'tornado', 'utopia', 
+        'voleibol', 'remolino', 'xilofonista', 'pez', 'zoologo', 'bebida', 'claridad', 'libélula', 
+        'eclipse', 'florecer', 'gravedad', 'huracán', 'iceberg', 'jaguar', 'koala', 'leopardo', 'mineral', 'nebulosa', 
+        'orquesta', 'paraiso', 'peculiar', 'adivinanza', 'serenidad', 'tsunami', 'universo', 'victorioso'
+    ],
+    'zh': [
+        '苹果', '香蕉', '橙子', '吉他', '幻想', '山', '冒险', '耳语', '阳光', '海豚', 
+        '大象', '自由', '冰川', '历史', '旅程', '袋鼠', '图书馆', '美人鱼', '笔记本', '海洋',
+        '拼图', '流沙', '彩虹', '星光', '宝藏', '雨伞', '火山', '瀑布', '木琴', 
+        '黄色', '斑马', '背包', '椰子', '直径', '工程师', '烟花', '感恩', '假期', '互联网', 
+        '丛林', '骑士', '笑声', '谜团', '怀旧', '章鱼', '企鹅', '质量', '散热器', '蓝宝石', 
+        '望远镜', '雨伞', '速度', '口哨', '排外', '年鉴', '和风', '气球', '指南针', 
+        '发现', '教育', '火烈鸟', '金鱼', '和谐', '岛屿', '茉莉花', '知识', '风景', 
+        '登山者', '怀旧', '八边形', '太平洋', '安静', '迷迭香', '海马', '龙卷风', '乌托邦', 
+        '排球', '漩涡', '木琴手', '黄尾鱼', '动物学家', '饮料', '清晰', '蜻蜓', 
+        '日食', '繁荣', '重力', '飓风', '冰山', '美洲虎', '考拉', '豹', '矿物', '星云', 
+        '管弦乐队', '天堂', '古怪', '谜语', '宁静', '海啸', '宇宙', '胜利者'
+    ],
+'hi': [
+        'सेब', 'केला', 'संतरा', 'गिटार', 'कल्पना', 'पहाड़', 'साहसिक', 'फुसफुसाना', 'धूप', 'डॉल्फिन', 
+        'हाथी', 'स्वतंत्रता', 'हिमनद', 'इतिहास', 'यात्रा', 'कंगारू', 'पुस्तकालय', 'जलपरी', 'नोटबुक', 'महासागर',
+        'पहेली', 'रेत', 'इंद्रधनुष', 'तारों की रोशनी', 'खजाना', 'छाता', 'ज्वालामुखी', 'झरना', 'जाइलोफोन', 
+        'पीला', 'ज़ेबरा', 'बैग', 'नारियल', 'व्यास', 'इंजीनियर', 'पटाखे', 'आभारी', 'छुट्टी', 'इंटरनेट', 
+        'जंगल', 'नाइट', 'हँसी', 'रहस्य', 'पुरानी यादें', 'ऑक्टोपस', 'पेंगुइन', 'गुणवत्ता', 'हीटर', 'नीलम', 
+        'दूरबीन', 'छाता', 'गति', 'सीटी', 'ज़ेनोफोबिया', 'वार्षिकी', 'झोंका', 'गुब्बारा', 'कम्पास', 
+        'खोज', 'शिक्षा', 'राजहंस', 'गोल्डफ़िश', 'संगीत', 'द्वीप', 'जैस्मिन', 'ज्ञान', 'दृश्य',
+        'पर्वतारोही', 'स्मृति', 'अष्टकोणीय', 'शांत', 'प्राचीन', 'घोड़ा', 'समुद्री घोड़ा', 'तूफान', 'यूटोपिया', 
+        'वॉलीबॉल', 'बवंडर', 'कसाई', 'पृष्ठपोषक', 'बैकपैक', 'तितली', 'अवलोकन', 'मंत्रमुग्ध', 'द्वंद्व'
+    ],
+    'ar': [
+        'تفاحة', 'موز', 'برتقال', 'غيتار', 'خيال', 'جبل', 'مغامرة', 'همس', 'شمس', 'دلفين', 
+        'فيل', 'حرية', 'نهر جليدي', 'تاريخ', 'رحلة', 'كنغر', 'مكتبة', 'حورية البحر', 'دفتر', 'محيطي',
+        'لغز', 'رمل', 'قوس قزح', 'ضوء النجوم', 'كنز', 'مظلة', 'بركان', 'شلال', 'اكسيلوفون', 
+        'أصفر', 'حمار وحشي', 'حقيبة', 'جوز الهند', 'قطر', 'مهندس', 'العاب نارية', 'شاكر', 'عطلة', 'الإنترنت', 
+        'غابة', 'فارس', 'ضحك', 'لغز', 'حنين', 'أخطبوط', 'بطريق', 'جودة', 'مبرد', 'ياقوت', 
+        'تلسكوب', 'مظلة', 'سرعة', 'صافرة', 'رهاب الأجانب', 'سنوي', 'نسيم', 'بالون', 'بوصلة', 
+        'اكتشاف', 'تعليم', 'فلامنغو', 'سمكة ذهبية', 'انسجام', 'جزيرة', 'ياسمين', 'معرفة', 'منظر طبيعي',
+        'متسلق الجبال', 'حنين', 'ثماني', 'هادئ', 'أسطوري', 'حصان', 'فرس البحر', 'إعصار', 'اليوتوبيا', 
+        'كرة طائرة', 'دوامة', 'تشيلو', 'موجة', 'علم الحيوان', 'مشروب', 'وضوح', 'يعسوب', 
+        'كسوف', 'ازدهار', 'جاذبية', 'إعصار', 'جبل جليدي', 'نمر', 'كوالا', 'فهد', 'معدن', 'سحابة',
+        'أوركسترا', 'فردوس', 'غريب', 'لغز', 'هدوء', 'تسونامي', 'كون', 'منتصر'
+    ],
+    'pt': [
+        'maçã', 'banana', 'laranja', 'violão', 'fantasia', 'montanha', 'aventura', 'sussurro', 'sol', 'golfinho', 
+        'elefante', 'liberdade', 'geleira', 'história', 'jornada', 'canguru', 'biblioteca', 'sereia', 'caderno', 'oceânico',
+        'quebra-cabeça', 'areia', 'arco-íris', 'luz das estrelas', 'tesouro', 'guarda-chuva', 'vulcão', 'cachoeira', 'xilofone', 
+        'amarelo', 'zebra', 'mochila', 'coco', 'diâmetro', 'engenheiro', 'fogo de artifício', 'grato', 'férias', 'internet', 
+        'selva', 'cavaleiro', 'riso', 'mistério', 'nostalgia', 'polvo', 'pinguim', 'qualidade', 'radiador', 'safira', 
+        'telescópio', 'guarda-chuva', 'velocidade', 'apito', 'xenofobia', 'anuário', 'zéfiro', 'balão', 'bússola', 
+        'descoberta', 'educação', 'flamingo', 'peixe dourado', 'harmonia', 'ilha', 'jasmim', 'conhecimento', 'paisagem',
+        'montanhista', 'nostálgico', 'octogonal', 'pacífico', 'tranquilidade', 'alecrim', 'cavalo-marinho', 'tornado', 'utopia', 
+        'vôlei', 'redemoinho', 'xilofonista', 'tubarão', 'zoológico', 'bebida', 'clareza', 'libélula', 
+        'eclipse', 'florescimento', 'gravidade', 'furacão', 'iceberg', 'onça', 'coala', 'leopardo', 'mineral', 'nebulosa',
+        'orquestra', 'paraíso', 'excêntrico', 'charada', 'serenidade', 'tsunami', 'universo', 'vitorioso'
+    ],
+    'ru': [
+        'яблоко', 'банан', 'апельсин', 'гитара', 'фантазия', 'гора', 'приключение', 'шёпот', 'солнце', 'дельфин', 
+        'слон', 'свобода', 'ледник', 'история', 'путешествие', 'кенгуру', 'библиотека', 'русалка', 'блокнот', 'океан',
+        'головоломка', 'песок', 'радуга', 'звездный свет', 'сокровище', 'зонт', 'вулкан', 'водопад', 'ксилофон', 
+        'желтый', 'зебра', 'рюкзак', 'кокос', 'диаметр', 'инженер', 'фейерверк', 'благодарный', 'каникулы', 'интернет', 
+        'джунгли', 'рыцарь', 'смех', 'тайна', 'ностальгия', 'осьминог', 'пингвин', 'качество', 'радиатор', 'сапфир', 
+        'телескоп', 'зонт', 'скорость', 'свисток', 'ксенофобия', 'ежегодник', 'зефир', 'шар', 'компас', 
+        'открытие', 'образование', 'фламинго', 'золотая рыбка', 'гармония', 'остров', 'жасмин', 'знание', 'пейзаж', 
+        'альпинист', 'ностальгический', 'восьмиугольник', 'мирный', 'тихий', 'лошадь', 'морской конёк', 'торнадо', 'утопия', 
+        'волейбол', 'вихрь', 'ксилофонист', 'тигр', 'зоолог', 'напиток', 'ясность', 'стрекоза', 
+        'затмение', 'расцвет', 'гравитация', 'ураган', 'айсберг', 'ягуар', 'коала', 'леопард', 'минерал', 'туманность',
+        'оркестр', 'рай', 'эксцентричный', 'загадка', 'спокойствие', 'цунами', 'вселенная', 'победитель'
+    ],
+    'fr': [
+        'pomme', 'banane', 'orange', 'guitare', 'imagination', 'montagne', 'aventure', 'murmure', 'soleil', 'dauphin', 
+        'éléphant', 'liberté', 'glacier', 'histoire', 'voyage', 'kangourou', 'bibliothèque', 'sirène', 'cahier', 'océan',
+        'énigme', 'sable', 'arc-en-ciel', 'lumière des étoiles', 'trésor', 'parapluie', 'volcan', 'cascade', 'xylophone', 
+        'jaune', 'zèbre', 'sac', 'noix de coco', 'diamètre', 'ingénieur', 'feu d’artifice', 'reconnaissant', 'vacances', 'internet', 
+        'jungle', 'chevalier', 'rire', 'mystère', 'nostalgie', 'poulpe', 'pingouin', 'qualité', 'chauffage', 'saphir', 
+        'télescope', 'parapluie', 'vitesse', 'sifflet', 'xénophobie', 'annuaire', 'zéphyr', 'ballon', 'boussole', 
+        'découverte', 'éducation', 'flamant', 'poisson rouge', 'harmonie', 'île', 'jasmin', 'connaissance', 'paysage', 
+        'alpiniste', 'octogonal', 'calme', 'ancien', 'légendaire', 'cheval', 'hippocampe', 'tornade', 'utopie', 
+        'volley-ball', 'tourbillon', 'violoncelliste', 'requin', 'zoologie', 'boisson', 'clarté', 'libellule', 
+        'éclipse', 'épanouissement', 'gravité', 'ouragan', 'iceberg', 'tigre', 'koala', 'léopard', 'minéral', 'nuage',
+        'orchestre', 'paradis', 'étrange', 'charade', 'calme', 'tsunami', 'univers', 'vainqueur'
+    ],
+'ko': [
+        '사과', '바나나', '오렌지', '기타', '환상', '산', '모험', '속삭임', '태양', '돌고래', 
+        '코끼리', '자유', '빙하', '역사', '여행', '캥거루', '도서관', '인어', '공책', '대양',
+        '퍼즐', '모래', '무지개', '별빛', '보물', '우산', '화산', '폭포', '실로폰', 
+        '노랑', '얼룩말', '가방', '코코넛', '지름', '엔지니어', '불꽃놀이', '감사', '휴가', '인터넷', 
+        '정글', '기사', '웃음', '신비', '향수', '문어', '펭귄', '품질', '난방기', '사파이어', 
+        '망원경', '우산', '속도', '휘파람', '외국인 혐오', '연감', '바람', '풍선', '나침반', 
+        '발견', '교육', '홍학', '금붕어', '조화', '섬', '재스민', '지식', '풍경', 
+        '등산가', '추억', '팔각형', '평온', '전설', '말', '해마', '폭풍', '유토피아', 
+        '배구', '회오리바람', '정육점', '파도', '동물원', '음료', '명확성', '잠자리', 
+        '일식', '번영', '중력', '태풍', '빙산', '호랑이', '코알라', '표범', '광물', '구름',
+        '오케스트라', '낙원', '이상한', '수수께끼', '고요함', '쓰나미', '우주', '승리'
+    ],
+    'ja': [
+        'りんご', 'バナナ', 'オレンジ', 'ギター', '幻想', '山', '冒険', 'ささやき', '太陽', 'イルカ', 
+        '象', '自由', '氷河', '歴史', '旅行', 'カンガルー', '図書館', '人魚', 'ノート', '大洋',
+        'パズル', '砂', '虹', '星明かり', '宝物', '傘', '火山', '滝', 'シロフォン', 
+        '黄色', 'シマウマ', 'カバン', 'ココナッツ', '直径', 'エンジニア', '花火', '感謝', '休暇', 'インターネット', 
+        'ジャングル', '騎士', '笑い', 'ミステリー', 'ノスタルジア', 'タコ', 'ペンギン', '品質', 'ヒーター', 'サファイア', 
+        '望遠鏡', '傘', '速度', 'ホイッスル', '外国人嫌悪', '年鑑', '風', '風船', 'コンパス', 
+        '発見', '教育', 'フラミンゴ', '金魚', '調和', '島', 'ジャスミン', '知識', '風景', 
+        '登山家', '追憶', '八角形', '静けさ', '伝説', '馬', 'タツノオトシゴ', '嵐', 'ユートピア', 
+        'バレーボール', '竜巻', '肉屋', '波', '動物園', '飲み物', '明確さ', 'トンボ', 
+        '日食', '繁栄', '重力', '台風', '氷山', 'トラ', 'コアラ', 'ヒョウ', '鉱物', '雲',
+        'オーケストラ', '楽園', '奇妙な', 'なぞなぞ', '静寂', '津波', '宇宙', '勝利'
+    ],
+    'el': [
+        'μήλο', 'μπανάνα', 'πορτοκάλι', 'κιθάρα', 'φαντασία', 'βουνό', 'περιπέτεια', 'ψίθυρος', 'ήλιος', 'δελφίνι', 
+        'ελέφαντας', 'ελευθερία', 'παγετώνας', 'ιστορία', 'ταξίδι', 'καγκουρό', 'βιβλιοθήκη', 'γοργόνα', 'σημειωματάριο', 'ωκεανός',
+        'γρίφος', 'άμμος', 'ουράνιο τόξο', 'αστερόφως', 'θησαυρός', 'ομπρέλα', 'ηφαίστειο', 'καταρράκτης', 'ξυλόφωνο', 
+        'κίτρινο', 'ζέβρα', 'τσάντα', 'καρύδα', 'διάμετρος', 'μηχανικός', 'πυροτεχνήματα', 'ευγνωμοσύνη', 'διακοπές', 'ίντερνετ', 
+        'ζούγκλα', 'ιππότης', 'γέλιο', 'μυστήριο', 'νοσταλγία', 'χταπόδι', 'πιγκουίνος', 'ποιότητα', 'καλοριφέρ', 'ζαφείρι', 
+        'τηλεσκόπιο', 'ομπρέλα', 'ταχύτητα', 'σφυρίχτρα', 'ξενοφοβία', 'επετηρίδα', 'αύρα', 'μπαλόνι', 'πυξίδα', 
+        'ανακάλυψη', 'εκπαίδευση', 'φλαμίνγκο', 'χρυσόψαρο', 'αρμονία', 'νησί', 'γιασεμί', 'γνώση', 'τοπίο', 
+        'ορειβάτης', 'αναμνήσεις', 'οκτάγωνο', 'γαλήνη', 'αρχαίος', 'άλογο', 'ιππόκαμπος', 'καταιγίδα', 'ουτοπία', 
+        'βόλεϊ', 'ανεμοστρόβιλος', 'κρεοπώλης', 'κύμα', 'ζωολογικός κήπος', 'ποτό', 'σαφήνεια', 'λιβελούλη', 
+        'έκλειψη', 'άνθιση', 'βαρύτητα', 'τυφώνας', 'παγόβουνο', 'τίγρη', 'κοάλα', 'λεοπάρδαλη', 'ορυκτό', 'σύννεφο',
+        'ορχήστρα', 'παράδεισος', 'παράξενο', 'αίνιγμα', 'ηρεμία', 'τσουνάμι', 'σύμπαν', 'νικητής'
+    ],
+    'he': [
+        'תפוח', 'בננה', 'תפוז', 'גיטרה', 'פנטזיה', 'הר', 'הרפתקה', 'לחישה', 'שמש', 'דולפין', 
+        'פיל', 'חירות', 'קרחון', 'היסטוריה', 'מסע', 'קנגורו', 'ספרייה', 'בת ים', 'מחברת', 'אוקיינוס',
+        'פאזל', 'חול', 'קשת בענן', 'אור כוכבים', 'אוצר', 'מטריה', 'הר געש', 'מפל', 'קסילופון', 
+        'צהוב', 'זברה', 'תיק', 'קוקוס', 'קוטר', 'מהנדס', 'זיקוקים', 'הכרת תודה', 'חופשה', 'אינטרנט', 
+        'ג׳ונגל', 'אביר', 'צחוק', 'מסתורין', 'געגוע', 'תמנון', 'פינגווין', 'איכות', 'רדיאטור', 'ספיר', 
+        'טלסקופ', 'מטריה', 'מהירות', 'שריקה', 'קסנופוביה', 'שנתון', 'רוח', 'בלון', 'מצפן', 
+        'תגלית', 'חינוך', 'פלמינגו', 'דג זהב', 'הרמוניה', 'אי', 'יסמין', 'ידע', 'נוף', 
+        'מטפס הרים', 'זיכרון', 'משושה', 'שלווה', 'אגדי', 'סוס', 'סוסון ים', 'סערה', 'אוטופיה', 
+        'כדורעף', 'סופה', 'אטליז', 'גל', 'גן חיות', 'משקה', 'בהירות', 'שפירית', 
+        'ליקוי', 'פריחה', 'כבידה', 'הוריקן', 'קרחון', 'נמר', 'קואלה', 'נמר', 'מינרל', 'ענן',
+        'תזמורת', 'גן עדן', 'מוזר', 'חידה', 'שלווה', 'צונאמי', 'יקום', 'מנצח'
+    ],
+'th': [
+        'แอปเปิ้ล', 'กล้วย', 'ส้ม', 'กีตาร์', 'จินตนาการ', 'ภูเขา', 'การผจญภัย', 'กระซิบ', 'ดวงอาทิตย์', 'ปลาโลมา',
+        'ช้าง', 'เสรีภาพ', 'ธารน้ำแข็ง', 'ประวัติศาสตร์', 'การเดินทาง', 'จิงโจ้', 'ห้องสมุด', 'นางเงือก', 'สมุดบันทึก', 'มหาสมุทร',
+        'ปริศนา', 'ทราย', 'สายรุ้ง', 'แสงดาว', 'สมบัติ', 'ร่ม', 'ภูเขาไฟ', 'น้ำตก', 'ระนาด',
+        'สีเหลือง', 'ม้าลาย', 'กระเป๋า', 'มะพร้าว', 'เส้นผ่าศูนย์กลาง', 'วิศวกร', 'ดอกไม้ไฟ', 'ความกตัญญู', 'วันหยุด', 'อินเทอร์เน็ต',
+        'ป่า', 'อัศวิน', 'เสียงหัวเราะ', 'ปริศนา', 'ความคิดถึง', 'ปลาหมึก', 'เพนกวิน', 'คุณภาพ', 'เครื่องทำความร้อน', 'ไพลิน',
+        'กล้องโทรทรรศน์', 'ร่ม', 'ความเร็ว', 'เสียงนกหวีด', 'ความกลัวชาวต่างชาติ', 'หนังสือประจำปี', 'ลม', 'ลูกโป่ง', 'เข็มทิศ',
+        'การค้นพบ', 'การศึกษา', 'ฟลามิงโก', 'ปลาทอง', 'ความสามัคคี', 'เกาะ', 'มะลิ', 'ความรู้', 'ทิวทัศน์',
+        'นักปีนเขา', 'ความทรงจำ', 'รูปแปดเหลี่ยม', 'ความสงบ', 'ตำนาน', 'ม้า', 'ม้าน้ำ', 'พายุ', 'ยูโทเปีย',
+        'วอลเลย์บอล', 'พายุทอร์นาโด', 'คนขายเนื้อ', 'คลื่น', 'สวนสัตว์', 'เครื่องดื่ม', 'ความชัดเจน', 'แมลงปอ',
+        'สุริยุปราคา', 'ความเจริญรุ่งเรือง', 'แรงโน้มถ่วง', 'ไต้ฝุ่น', 'ภูเขาน้ำแข็ง', 'เสือ', 'โคอาลา', 'เสือดาว', 'แร่ธาตุ', 'เมฆ',
+        'วงออเคสตรา', 'สวรรค์', 'แปลก', 'ปริศนา', 'ความเงียบ', 'สึนามิ', 'จักรวาล', 'ชัยชนะ'
+    ],
+    'tr': [
+        'elma', 'muz', 'portakal', 'gitar', 'fantezi', 'dağ', 'macera', 'fısıltı', 'güneş', 'yunus',
+        'fil', 'özgürlük', 'buzul', 'tarih', 'yolculuk', 'kanguru', 'kütüphane', 'denizkızı', 'defter', 'okyanus',
+        'bulmaca', 'kum', 'gökkuşağı', 'yıldız ışığı', 'hazine', 'şemsiye', 'yanardağ', 'şelale', 'ksilofon',
+        'sarı', 'zebra', 'çanta', 'hindistancevizi', 'çap', 'mühendis', 'havai fişek', 'minnettar', 'tatil', 'internet',
+        'orman', 'şövalye', 'kahkaha', 'gizem', 'hasret', 'ahtapot', 'penguen', 'kalite', 'ısıtıcı', 'safir',
+        'teleskop', 'şemsiye', 'hız', 'düdük', 'yabancı düşmanlığı', 'yıllık', 'rüzgar', 'balon', 'pusula',
+        'keşif', 'eğitim', 'flamingo', 'japon balığı', 'uyum', 'ada', 'yasemin', 'bilgi', 'manzara',
+        'dağcı', 'anı', 'sekizgen', 'huzur', 'efsane', 'at', 'denizatı', 'fırtına', 'ütopya',
+        'voleybol', 'kasırga', 'kasap', 'dalga', 'hayvanat bahçesi', 'içecek', 'açıklık', 'yusufçuk',
+        'güneş tutulması', 'refah', 'yerçekimi', 'tayfun', 'buzdağı', 'kaplan', 'koala', 'leopar', 'mineral', 'bulut',
+        'orkestra', 'cennet', 'garip', 'bilmece', 'sessizlik', 'tsunami', 'evren', 'zafer'
+    ],
+    'vi': [
+        'táo', 'chuối', 'cam', 'đàn ghita', 'ảo tưởng', 'núi', 'phiêu lưu', 'thì thầm', 'mặt trời', 'cá heo',
+        'voi', 'tự do', 'sông băng', 'lịch sử', 'chuyến du lịch', 'chuột túi', 'thư viện', 'nàng tiên cá', 'vở ghi', 'đại dương',
+        'câu đố', 'cát', 'cầu vồng', 'ánh sao', 'kho báu', 'ô dù', 'núi lửa', 'thác nước', 'mộc cầm',
+        'màu vàng', 'ngựa vằn', 'túi xách', 'dừa', 'đường kính', 'kỹ sư', 'pháo hoa', 'lòng biết ơn', 'kỳ nghỉ', 'internet',
+        'rừng nhiệt đới', 'hiệp sĩ', 'tiếng cười', 'bí ẩn', 'nỗi nhớ', 'bạch tuộc', 'chim cánh cụt', 'chất lượng', 'máy sưởi', 'ngọc bích',
+        'kính viễn vọng', 'ô dù', 'tốc độ', 'còi', 'sự bài ngoại', 'niên giám', 'gió', 'bóng bay', 'la bàn',
+        'khám phá', 'giáo dục', 'hồng hạc', 'cá vàng', 'hài hòa', 'đảo', 'hoa nhài', 'kiến thức', 'cảnh quan',
+        'người leo núi', 'kỷ niệm', 'hình bát giác', 'yên bình', 'huyền thoại', 'ngựa', 'cá ngựa', 'bão tố', 'không tưởng',
+        'bóng chuyền', 'lốc xoáy', 'người bán thịt', 'sóng', 'vườn thú', 'đồ uống', 'rõ ràng', 'chuồn chuồn',
+        'nhật thực', 'phồn thịnh', 'trọng lực', 'bão', 'tảng băng', 'hổ', 'gấu túi', 'báo', 'khoáng sản', 'đám mây',
+        'dàn nhạc', 'thiên đường', 'kỳ lạ', 'câu đố', 'tĩnh lặng', 'sóng thần', 'vũ trụ', 'chiến thắng'
+    ],
+'pl': [
+        'jabłko', 'banan', 'pomarańcza', 'gitara', 'fantazja', 'góra', 'przygoda', 'szept', 'słońce', 'delfin',
+        'słoń', 'wolność', 'lodowiec', 'historia', 'podróż', 'kangur', 'biblioteka', 'syrena', 'notatnik', 'ocean',
+        'zagadki', 'piasek', 'tęcza', 'światło gwiazd', 'skarb', 'parasol', 'wulkan', 'wodospad', 'ksylofon',
+        'żółty', 'zebra', 'torba', 'kokos', 'średnica', 'inżynier', 'fajerwerki', 'wdzięczność', 'wakacje', 'internet',
+        'las', 'rycerz', 'śmiech', 'tajemnica', 'tęsknota', 'ośmiornica', 'pingwin', 'jakość', 'grzejnik', 'szafir',
+        'teleskop', 'parasol', 'prędkość', 'gwizdek', 'ksenofobia', 'rocznik', 'wiatr', 'balon', 'kompas',
+        'odkrycie', 'edukacja', 'flaming', 'złota rybka', 'harmonia', 'wyspa', 'jaśmin', 'wiedza', 'krajobraz',
+        'wspinacz', 'wspomnienia', 'ośmiokąt', 'spokój', 'legenda', 'koń', 'konik morski', 'burza', 'utopia',
+        'siatkówka', 'huragan', 'rzeźnik', 'fala', 'zoo', 'napój', 'jasność', 'ważka',
+        'zaćmienie słońca', 'dobrobyt', 'grawitacja', 'tajfun', 'góra lodowa', 'tygrys', 'koala', 'lampart', 'minerał', 'chmura',
+        'orkiestra', 'niebo', 'dziwne', 'zagadki', 'cisza', 'tsunami', 'wszechświat', 'zwycięstwo'
+    ],
+    'nl': [
+        'appel', 'banaan', 'sinaasappel', 'gitaar', 'fantasie', 'berg', 'avontuur', 'fluisteren', 'zon', 'dolfijn',
+        'olifant', 'vrijheid', 'gletsjer', 'geschiedenis', 'reis', 'kangoeroe', 'bibliotheek', 'zeemeermin', 'notitieboek', 'oceaan',
+        'puzzel', 'zand', 'regenboog', 'sterrenlicht', 'schat', 'paraplu', 'vulkaan', 'waterval', 'xylofoon',
+        'geel', 'zebra', 'tas', 'kokosnoot', 'diameter', 'ingenieur', 'vuurwerk', 'dankbaarheid', 'vakantie', 'internet',
+        'bos', 'ridder', 'gelach', 'mysterie', 'heimwee', 'octopus', 'pinguïn', 'kwaliteit', 'verwarming', 'saffier',
+        'telescoop', 'paraplu', 'snelheid', 'fluitje', 'xenofobie', 'jaarboek', 'wind', 'ballon', 'kompas',
+        'ontdekking', 'onderwijs', 'flamingo', 'goudvis', 'harmonie', 'eiland', 'jasmijn', 'kennis', 'landschap',
+        'bergbeklimmer', 'herinnering', 'achthoek', 'rust', 'legende', 'paard', 'zeepaardje', 'storm', 'utopie',
+        'volleybal', 'orkaan', 'slager', 'golf', 'dierentuin', 'drankje', 'duidelijkheid', 'libelle',
+        'zonsverduistering', 'welvaart', 'zwaartekracht', 'tyfoon', 'ijsberg', 'tijger', 'koala', 'luipaard', 'mineraal', 'wolk',
+        'orkest', 'hemel', 'vreemd', 'raadsel', 'stilte', 'tsunami', 'universum', 'overwinning'
+    ],
+    'sv': [
+        'äpple', 'banan', 'apelsin', 'gitarr', 'fantasi', 'berg', 'äventyr', 'viskning', 'sol', 'delfin',
+        'elefant', 'frihet', 'glaciär', 'historia', 'resa', 'känguru', 'bibliotek', 'sjöjungfru', 'anteckningsbok', 'hav',
+        'gåta', 'sand', 'regnbåge', 'stjärnljus', 'skatt', 'paraply', 'vulkan', 'vattenfall', 'xylofon',
+        'gul', 'zebra', 'väska', 'kokosnöt', 'diameter', 'ingenjör', 'fyrverkeri', 'tacksamhet', 'semester', 'internet',
+        'skog', 'riddare', 'skratt', 'mysterium', 'längtan', 'bläckfisk', 'pingvin', 'kvalitet', 'värmare', 'safir',
+        'teleskop', 'paraply', 'hastighet', 'visselpipa', 'xenofobi', 'årsbok', 'vind', 'ballong', 'kompass',
+        'upptäckt', 'utbildning', 'flamingo', 'guldfisk', 'harmoni', 'ö', 'jasmin', 'kunskap', 'landskap',
+        'bergsklättrare', 'minne', 'åttahörning', 'frid', 'legend', 'häst', 'sjöhäst', 'storm', 'utopi',
+        'volleyboll', 'orkan', 'slaktare', 'våg', 'zoo', 'dryck', 'klarhet', 'trollslända',
+        'solförmörkelse', 'välstånd', 'gravitation', 'tyfon', 'isberg', 'tiger', 'koala', 'leopard', 'mineral', 'moln',
+        'orkester', 'himmel', 'konstig', 'gåta', 'tystnad', 'tsunami', 'universum', 'seger'
+    ],
+'it': [
+        'mela', 'banana', 'arancia', 'chitarra', 'fantasia', 'montagna', 'avventura', 'sussurro', 'sole', 'delfino',
+        'elefante', 'libertà', 'ghiacciaio', 'storia', 'viaggio', 'canguro', 'biblioteca', 'sirena', 'taccuino', 'oceano',
+        'enigma', 'sabbia', 'arcobaleno', 'luce delle stelle', 'tesoro', 'ombrello', 'vulcano', 'cascata', 'xilofono',
+        'giallo', 'zebra', 'borsa', 'cocco', 'diametro', 'ingegnere', 'fuochi d\'artificio', 'gratitudine', 'vacanza', 'internet',
+        'foresta', 'cavaliere', 'risata', 'mistero', 'nostalgia', 'polpo', 'pinguino', 'qualità', 'riscaldamento', 'zaffiro',
+        'telescopio', 'ombrello', 'velocità', 'fischietto', 'xenofobia', 'annuario', 'vento', 'palloncino', 'bussola',
+        'scoperta', 'educazione', 'fenicottero', 'pesce rosso', 'armonia', 'isola', 'gelsomino', 'conoscenza', 'paesaggio',
+        'scalatore', 'memorie', 'ottagono', 'serenità', 'leggenda', 'cavallo', 'cavalluccio marino', 'tempesta', 'utopia',
+        'pallavolo', 'uragano', 'macellaio', 'onda', 'zoo', 'bevanda', 'chiarezza', 'libellula',
+        'eclissi solare', 'prosperità', 'gravità', 'tifone', 'iceberg', 'tigre', 'koala', 'leopardo', 'minerale', 'nuvola',
+        'orchestra', 'cielo', 'strano', 'enigma', 'silenzio', 'tsunami', 'universo', 'vittoria'
+    ],
+    'fi': [
+        'omena', 'banaani', 'appelsiini', 'kitara', 'fantasia', 'vuori', 'seikkailu', 'kuiskaus', 'aurinko', 'delfiini',
+        'norsu', 'vapaus', 'jäätikkö', 'historia', 'matka', 'kenguru', 'kirjasto', 'merenneito', 'muistikirja', 'valtameri',
+        'arvoitus', 'hiekka', 'sateenkaari', 'tähtivalo', 'aarre', 'sateenvarjo', 'tulivuori', 'vesiputous', 'xylophoni',
+        'keltainen', 'seepra', 'laukku', 'kookospähkinä', 'halkaisija', 'insinööri', 'ilotulitus', 'kiitollisuus', 'loma', 'internet',
+        'metsä', 'ritari', 'nauru', 'mysteeri', 'ikävä', 'mustekala', 'pingviini', 'laatu', 'lämmitys', 'safiiri',
+        'kaukoputki', 'sateenvarjo', 'nopeus', 'pilli', 'xenofobia', 'vuosikirja', 'tuuli', 'ilmapallo', 'kompassi',
+        'löytö', 'koulutus', 'flamingo', 'kultakala', 'harmonia', 'saari', 'jasmiini', 'tieto', 'maisema',
+        'vuorikiipeilijä', 'muisto', 'oktagon', 'rauha', 'legenda', 'hevonen', 'merihevonen', 'myrsky', 'utopia',
+        'lentopallo', 'hurrikaani', 'teurastaja', 'aalto', 'eläintarha', 'juoma', 'selkeys', 'sudenkorento',
+        'auringonpimennys', 'vauraus', 'painovoima', 'taifuuni', 'jäävuori', 'tiikeri', 'koala', 'leopardi', 'mineraali', 'pilvi',
+        'orkesteri', 'taivas', 'outo', 'arvoitus', 'hiljaisuus', 'tsunami', 'universumi', 'voitto'
+    ],
+    'no': [
+        'eple', 'banan', 'appelsin', 'gitar', 'fantasi', 'fjell', 'eventyr', 'hviske', 'sol', 'delfin',
+        'elefant', 'frihet', 'isbre', 'historie', 'reise', 'kenguru', 'bibliotek', 'havfrue', 'notatbok', 'hav',
+        'gåte', 'sand', 'regnbue', 'stjernelys', 'skatt', 'paraply', 'vulkan', 'fossefall', 'xylofon',
+        'gul', 'sebra', 'veske', 'kokosnøtt', 'diameter', 'ingeniør', 'fyrverkeri', 'takknemlighet', 'ferie', 'internett',
+        'skog', 'ridder', 'latter', 'mysterium', 'hjemlengsel', 'blekksprut', 'pingvin', 'kvalitet', 'oppvarming', 'safir',
+        'teleskop', 'paraply', 'hastighet', 'fløyte', 'xenofobi', 'årbok', 'vind', 'ballong', 'kompass',
+        'oppdagelse', 'utdanning', 'flamingo', 'gullfisk', 'harmoni', 'øy', 'jasmin', 'kunnskap', 'landskap',
+        'fjellklatrer', 'minner', 'oktagon', 'fred', 'legende', 'hest', 'sjøhest', 'storm', 'utopi',
+        'volleyball', 'orkan', 'slakter', 'bølge', 'dyrehage', 'drikk', 'klarhet', 'øyenstikker',
+        'solformørkelse', 'velstand', 'gravitasjon', 'tyfon', 'isfjell', 'tiger', 'koala', 'leopard', 'mineral', 'sky',
+        'orkester', 'himmel', 'rar', 'gåte', 'stillhet', 'tsunami', 'univers', 'seier'
+    ],
+ 'da': [
+        'æble', 'banan', 'appelsin', 'guitar', 'fantasi', 'bjerg', 'eventyr', 'hvisken', 'sol', 'delfin',
+        'elefant', 'frihed', 'gletscher', 'historie', 'rejse', 'kænguru', 'bibliotek', 'havfrue', 'notatbog', 'ocean',
+        'gåde', 'sand', 'regnbue', 'stjernelys', 'skat', 'paraply', 'vulkan', 'vandfald', 'xylofon',
+        'gul', 'zebra', 'taske', 'kokosnød', 'diameter', 'ingeniør', 'fyrværkeri', 'taknemmelighed', 'ferie', 'internet',
+        'skov', 'ridder', 'latter', 'mysterium', 'hjemve', 'blæksprutte', 'pingvin', 'kvalitet', 'opvarmning', 'safir',
+        'teleskop', 'paraply', 'hastighed', 'fløjte', 'xenofobi', 'årbog', 'vind', 'ballon', 'kompas',
+        'opdagelse', 'uddannelse', 'flamingo', 'guldfisk', 'harmoni', 'ø', 'jasmin', 'viden', 'landskab',
+        'bjergbestiger', 'minder', 'oktogon', 'fred', 'legende', 'hest', 'søhest', 'storm', 'utopi',
+        'volleyball', 'orkan', 'slagter', 'bølge', 'zoologisk have', 'drik', 'klarhed', 'guldsmed',
+        'solformørkelse', 'velstand', 'tyngdekraft', 'tyfon', 'isbjerg', 'tiger', 'koala', 'leopard', 'mineral', 'sky',
+        'orkester', 'himmel', 'mærkelig', 'gåde', 'stilhed', 'tsunami', 'univers', 'sejr'
+    ],
+    'cs': [
+        'jablko', 'banán', 'pomeranč', 'kytara', 'fantazie', 'hora', 'dobrodružství', 'šeptání', 'slunce', 'delfín',
+        'slon', 'svoboda', 'ledovec', 'historie', 'cesta', 'klokan', 'knihovna', 'mořská panna', 'notebook', 'oceán',
+        'záhada', 'písek', 'duha', 'hvězdné světlo', 'poklad', 'deštník', 'sopka', 'vodopád', 'xylofon',
+        'žlutá', 'zebra', 'taška', 'kokosový ořech', 'průměr', 'inženýr', 'ohňostroj', 'vděčnost', 'dovolená', 'internet',
+        'les', 'rytíř', 'smích', 'záhada', 'stesk po domově', 'chobotnice', 'tučňák', 'kvalita', 'topení', 'safír',
+        'dalekohled', 'deštník', 'rychlost', 'píšťalka', 'xenofobie', 'ročenka', 'vítr', 'balón', 'kompas',
+        'objev', 'vzdělání', 'plameňák', 'zlatá rybka', 'harmonie', 'ostrov', 'jasmín', 'znalost', 'krajina',
+        'horolezec', 'vzpomínky', 'osmiúhelník', 'mír', 'legenda', 'kůň', 'mořský koník', 'bouře', 'utopie',
+        'volejbal', 'hurikán', 'řezník', 'vlna', 'zoo', 'nápoj', 'jasnost', 'vážka',
+        'sluneční zatmění', 'prosperita', 'gravitace', 'tajfun', 'ledovec', 'tygr', 'koala', 'levhart', 'minerál', 'mrak',
+        'orchestr', 'nebe', 'divný', 'záhada', 'ticho', 'tsunami', 'vesmír', 'vítězství'
+    ],
+    'hu': [
+        'alma', 'banán', 'narancs', 'gitár', 'fantázia', 'hegy', 'kaland', 'suttogás', 'nap', 'delfin',
+        'elefánt', 'szabadság', 'gleccser', 'történelem', 'utazás', 'kenguru', 'könyvtár', 'sellő', 'jegyzetfüzet', 'óceán',
+        'rejtvény', 'homok', 'szivárvány', 'csillagfény', 'kincs', 'esernyő', 'vulkán', 'vízesés', 'xilofon',
+        'sárga', 'zebra', 'táska', 'kókuszdió', 'átmérő', 'mérnök', 'tűzijáték', 'hála', 'nyaralás', 'internet',
+        'erdő', 'lovag', 'nevetés', 'rejtély', 'honvágy', 'polip', 'pingvin', 'minőség', 'fűtés', 'zafír',
+        'távcső', 'esernyő', 'sebesség', 'sípszó', 'xenofóbia', 'évkönyv', 'szél', 'léggömb', 'iránytű',
+        'felfedezés', 'oktatás', 'flamingó', 'aranyhal', 'harmónia', 'sziget', 'jázmin', 'tudás', 'táj',
+        'hegymászó', 'emlékek', 'nyolcszög', 'béke', 'legenda', 'ló', 'csikóhal', 'vihar', 'utópia',
+        'röplabda', 'hurrikán', 'mészáros', 'hullám', 'állatkert', 'ital', 'tisztaság', 'szitakötő',
+        'napfogyatkozás', 'prosperitás', 'gravitáció', 'tájfun', 'jéghegy', 'tigris', 'koala', 'párduc', 'ásvány', 'felhő',
+        'zenekar', 'ég', 'furcsa', 'rejtvény', 'csend', 'szökőár', 'univerzum', 'győzelem'
+    ],
+'bg': [
+        'ябълка', 'банан', 'портокал', 'китара', 'фантазия', 'планина', 'приключение', 'шепот', 'слънце', 'делфин',
+        'слон', 'свобода', 'ледник', 'история', 'пътуване', 'кенгуру', 'библиотека', 'русалка', 'тетрадка', 'океан',
+        'загадка', 'пясък', 'дъга', 'звездна светлина', 'съкровище', 'чадър', 'вулкан', 'водопад', 'ксилофон',
+        'жълто', 'зебра', 'чанта', 'кокосов орех', 'диаметър', 'инженер', 'фойерверки', 'благодарност', 'почивка', 'интернет',
+        'гора', 'рицар', 'смях', 'мистерия', 'тъга за дома', 'октопод', 'пингвин', 'качество', 'отопление', 'сапфир',
+        'телескоп', 'чадър', 'скорост', 'свирка', 'ксенофобия', 'годишник', 'вятър', 'балон', 'компас',
+        'откритие', 'образование', 'фламинго', 'златна рибка', 'хармония', 'остров', 'жасмин', 'знание', 'пейзаж',
+        'алпинист', 'спомени', 'осмоъгълник', 'мир', 'легенда', 'кон', 'морско конче', 'буря', 'утопия',
+        'волейбол', 'ураган', 'касапин', 'вълна', 'зоопарк', 'напитка', 'яснота', 'водно конче',
+        'слънчево затъмнение', 'процъфтяване', 'гравитация', 'тайфун', 'айсберг', 'тигър', 'коала', 'леопард', 'минерал', 'облак',
+        'оркестър', 'небе', 'странен', 'загадка', 'тишина', 'цунами', 'вселена', 'победа'
+    ],
+    'ro': [
+        'măr', 'banană', 'portocală', 'chitară', 'fantezie', 'munte', 'aventură', 'șoaptă', 'soare', 'delfin',
+        'elefant', 'libertate', 'ghețar', 'istorie', 'călătorie', 'cangur', 'bibliotecă', 'sirena', 'caiet', 'ocean',
+        'mister', 'nisip', 'curcubeu', 'lumină de stele', 'comoară', 'umbrelă', 'vulcan', 'cascadă', 'xilofon',
+        'galben', 'zebră', 'geantă', 'nucă de cocos', 'diametru', 'inginer', 'artificii', 'recunoștință', 'vacanță', 'internet',
+        'pădure', 'cavaler', 'râs', 'mister', 'dor de casă', 'caracatiță', 'pinguin', 'calitate', 'încălzire', 'safir',
+        'telescop', 'umbrelă', 'viteză', 'fluier', 'xenofobie', 'anuar', 'vânt', 'balon', 'busolă',
+        'descoperire', 'educație', 'flamingo', 'peștișor auriu', 'armonie', 'insulă', 'iasomie', 'cunoaștere', 'peisaj',
+        'alpinist', 'amintiri', 'octogon', 'pace', 'legendă', 'cal', 'căluț de mare', 'furtună', 'utopie',
+        'volei', 'uragan', 'măcelar', 'val', 'grădină zoologică', 'băutură', 'claritate', 'libelulă',
+        'eclipsă solară', 'prosperitate', 'gravitație', 'taifun', 'aisberg', 'tigru', 'koala', 'leopard', 'mineral', 'nor',
+        'orchestră', 'cer', 'ciudat', 'mister', 'liniște', 'tsunami', 'univers', 'victorie'
+    ],
+    'id': [
+        'apel', 'pisang', 'jeruk', 'gitar', 'fantasi', 'gunung', 'petualangan', 'bisikan', 'matahari', 'lumba-lumba',
+        'gajah', 'kebebasan', 'gletser', 'sejarah', 'perjalanan', 'kanguru', 'perpustakaan', 'putri duyung', 'buku catatan', 'samudra',
+        'teka-teki', 'pasir', 'pelangi', 'cahaya bintang', 'harta karun', 'payung', 'gunung berapi', 'air terjun', 'xilofon',
+        'kuning', 'zebra', 'tas', 'kelapa', 'diameter', 'insinyur', 'kembang api', 'rasa syukur', 'liburan', 'internet',
+        'hutan', 'ksatria', 'tertawa', 'misteri', 'rindu rumah', 'gurita', 'pinguin', 'kualitas', 'pemanasan', 'safir',
+        'teleskop', 'payung', 'kecepatan', 'peluit', 'ksenofobia', 'buku tahunan', 'angin', 'balon', 'kompas',
+        'penemuan', 'pendidikan', 'flamingo', 'ikan mas', 'harmoni', 'pulau', 'melati', 'pengetahuan', 'pemandangan',
+        'pendaki gunung', 'kenangan', 'segi delapan', 'damai', 'legenda', 'kuda', 'kuda laut', 'badai', 'utopia',
+        'voli', 'badai tropis', 'penjagal', 'ombak', 'kebun binatang', 'minuman', 'kejernihan', 'capung',
+        'gerhana matahari', 'kemakmuran', 'gravitasi', 'topan', 'gunung es', 'harimau', 'koala', 'macan tutul', 'mineral', 'awan',
+        'orkestra', 'langit', 'aneh', 'teka-teki', 'keheningan', 'tsunami', 'alam semesta', 'kemenangan'
+    ],
+'ms': [
+        'epal', 'pisang', 'oren', 'gitar', 'fantasi', 'gunung', 'pengembaraan', 'bisikan', 'matahari', 'lumba-lumba',
+        'gajah', 'kebebasan', 'glasier', 'sejarah', 'perjalanan', 'kanggaru', 'perpustakaan', 'duyung', 'buku nota', 'lautan',
+        'teka-teki', 'pasir', 'pelangi', 'cahaya bintang', 'harta karun', 'payung', 'gunung berapi', 'air terjun', 'xilofon',
+        'kuning', 'zebra', 'beg', 'kelapa', 'diameter', 'jurutera', 'bunga api', 'kesyukuran', 'percutian', 'internet',
+        'hutan', 'kesatria', 'ketawa', 'misteri', 'rindu rumah', 'sotong', 'penguin', 'kualiti', 'pemanasan', 'nilam',
+        'teleskop', 'payung', 'kelajuan', 'wisel', 'ksenofobia', 'buku tahunan', 'angin', 'belon', 'kompas',
+        'penemuan', 'pendidikan', 'flamingo', 'ikan emas', 'harmoni', 'pulau', 'melur', 'pengetahuan', 'pemandangan',
+        'pendaki', 'kenangan', 'segi lapan', 'damai', 'lagenda', 'kuda', 'kuda laut', 'ribut', 'utopia',
+        'bola tampar', 'taufan', 'penyembelih', 'ombak', 'zoo', 'minuman', 'kejelasan', 'pepatung',
+        'gerhana matahari', 'kemakmuran', 'graviti', 'taufan', 'aisberg', 'harimau', 'koala', 'leopard', 'mineral', 'awan',
+        'orkestra', 'langit', 'ganjil', 'teka-teki', 'kesunyian', 'tsunami', 'alam semesta', 'kemenangan'
+    ],
+    'sw': [
+        'tufaha', 'ndizi', 'chungwa', 'gitaa', 'ndoto', 'mlima', 'uhondo', 'mnong\'ono', 'jua', 'pomboo',
+        'tembo', 'uhuru', 'barafu', 'historia', 'safari', 'kangaruu', 'maktaba', 'siria', 'daftari', 'bahari',
+        'kitendawili', 'mchanga', 'upinde wa mvua', 'mwanga wa nyota', 'hazina', 'mwavuli', 'mlipuko', 'maporomoko ya maji', 'ksilofoni',
+        'njano', 'pundamilia', 'mfuko', 'nazi', 'kipenyo', 'mhandisi', 'fataki', 'shukrani', 'likizo', 'intaneti',
+        'msitu', 'shujaa', 'kicheko', 'fumbo', 'hamu ya nyumbani', 'pweza', 'pengwini', 'ubora', 'joto', 'yakuti',
+        'darubini', 'mwavuli', 'kasi', 'filimbi', 'ksenofobia', 'kitabu cha kumbukumbu', 'upepo', 'puto', 'kipimo cha mwelekeo',
+        'uvumbuzi', 'elimu', 'flamingo', 'samaki wa dhahabu', 'maelewano', 'kisiwa', 'jasmini', 'maarifa', 'mandhari',
+        'mpandaji', 'kumbukumbu', 'pembe nane', 'amani', 'hadithi', 'farasi', 'farasi wa bahari', 'dhuruba', 'ndoto nzuri',
+        'voliboli', 'kimbunga', 'mchinjaji', 'wimbi', 'mbuga ya wanyama', 'kinywaji', 'uwazi', 'panzi wa maji',
+        'kupatwa kwa jua', 'ufanisi', 'mvuto', 'kimbunga', 'theluji', 'chui', 'koala', 'chui', 'madini', 'wingu',
+        'bendi', 'anga', 'ajabu', 'fumbo', 'utulivu', 'tsunami', 'ulimwengu', 'ushindi'
+    ],
+    'uk': [
+        'яблуко', 'банан', 'апельсин', 'гітара', 'фантазія', 'гора', 'пригоди', 'шепіт', 'сонце', 'дельфін',
+        'слон', 'свобода', 'льодовик', 'історія', 'подорож', 'кенгуру', 'бібліотека', 'русалка', 'зошит', 'океан',
+        'загадка', 'пісок', 'веселка', 'світло зірок', 'скарб', 'парасолька', 'вулкан', 'водоспад', 'ксилофон',
+        'жовтий', 'зебра', 'сумка', 'кокос', 'діаметр', 'інженер', 'феєрверк', 'вдячність', 'відпочинок', 'інтернет',
+        'ліс', 'лицар', 'сміх', 'таємниця', 'сум за домом', 'восьминіг', 'пінгвін', 'якість', 'теплота', 'сапфір',
+        'телескоп', 'парасолька', 'швидкість', 'свисток', 'ксенофобія', 'річний альманах', 'вітер', 'кулька', 'компас',
+        'відкриття', 'освіта', 'фламінго', 'золота рибка', 'гармонія', 'острів', 'жасмин', 'знання', 'пейзаж',
+        'альпініст', 'спогади', 'восьмикутник', 'мир', 'легенда', 'кінь', 'морський коник', 'буря', 'утопія',
+        'волейбол', 'ураган', 'м\'ясник', 'хвиля', 'зоопарк', 'напій', 'ясність', 'бабка',
+        'сонячне затемнення', 'процвітання', 'гравітація', 'тайфун', 'айсберг', 'тигр', 'коала', 'леопард', 'мінерал', 'хмара',
+        'оркестр', 'небо', 'дивний', 'загадка', 'тиша', 'цунамі', 'всесвіт', 'перемога'
+    ],
+ 'fi': [
+        'omena', 'banaani', 'appelsiini', 'kitara', 'fantasia', 'vuori', 'seikkailu', 'kuiskaus', 'aurinko', 'delfiini',
+        'norsu', 'vapaus', 'jäätikkö', 'historia', 'matka', 'kenguru', 'kirjasto', 'merenneito', 'muistikirja', 'valtameri',
+        'arvoitus', 'hiekka', 'sateenkaari', 'tähdenvalo', 'aarre', 'sateenvarjo', 'tulivuori', 'vesiputous', 'xylophone',
+        'keltainen', 'seepra', 'laukku', 'kookospähkinä', 'halkaisija', 'insinööri', 'ilotulitus', 'kiitollisuus', 'loma', 'internet',
+        'metsä', 'ritari', 'nauru', 'mysteeri', 'kotimaa', 'mustekala', 'pingviini', 'laatu', 'lämpö', 'safiiri',
+        'kaukoputki', 'nopeus', 'pilli', 'ksenofoobia', 'vuosikirja', 'tuuli', 'ilmapallo', 'kompassi',
+        'löytö', 'koulutus', 'flamingo', 'kultakala', 'harmonia', 'saari', 'jasmiini', 'tieto', 'maisema',
+        'kiipeilijä', 'muisto', 'kahdeksankulmainen', 'rauha', 'legenda', 'hevonen', 'merihevonen', 'myrsky', 'utopia',
+        'lentopallo', 'hurrikaani', 'teurastaja', 'aalto', 'eläintarha', 'juoma', 'selkeys', 'sudenkorento',
+        'auringonpimennys', 'vauraus', 'painovoima', 'taifuuni', 'jäävuori', 'tiikeri', 'koala', 'leopardi', 'mineraali', 'pilvi',
+        'orkesteri', 'taivas', 'outo', 'arvoitus', 'hiljaisuus', 'tsunami', 'maailmankaikkeus', 'voitto'
+    ],
+    'ro': [
+        'măr', 'banană', 'portocală', 'chitară', 'fantezie', 'munte', 'aventură', 'șoaptă', 'soare', 'delfin',
+        'elefant', 'libertate', 'ghețar', 'istorie', 'călătorie', 'cangur', 'bibliotecă', 'sirena', 'caiet', 'ocean',
+        'ghicitoare', 'nisip', 'curcubeu', 'lumina stelelor', 'comoară', 'umbrelă', 'vulcan', 'cascadă', 'xilofon',
+        'galben', 'zebră', 'geantă', 'nucă de cocos', 'diametru', 'inginer', 'focuri de artificii', 'recunoștință', 'vacanță', 'internet',
+        'pădure', 'cavaler', 'râs', 'mister', 'dor de casă', 'caracatiță', 'pinguin', 'calitate', 'căldură', 'safir',
+        'telescop', 'viteza', 'fluier', 'xenofobie', 'anuar', 'vânt', 'balon', 'busolă',
+        'descoperire', 'educație', 'flamingo', 'pește auriu', 'armonie', 'insulă', 'iasomie', 'cunoaștere', 'peisaj',
+        'alpinist', 'amintiri', 'octogon', 'pace', 'legendă', 'cal', 'căluț de mare', 'furtună', 'utopie',
+        'volei', 'uragan', 'măcelar', 'val', 'grădină zoologică', 'băutură', 'claritate', 'libelulă',
+        'eclipsă solară', 'prosperitate', 'gravitație', 'taifun', 'aisberg', 'tigru', 'koala', 'leopard', 'mineral', 'nor',
+        'orchestră', 'cer', 'ciudat', 'ghicitoare', 'liniște', 'tsunami', 'univers', 'victorie'
+    ],
+    'hu': [
+        'alma', 'banán', 'narancs', 'gitár', 'fantázia', 'hegy', 'kaland', 'suttogás', 'nap', 'delfin',
+        'elefánt', 'szabadság', 'gleccser', 'történelem', 'utazás', 'kenguru', 'könyvtár', 'sellő', 'jegyzetfüzet', 'óceán',
+        'rejtvény', 'homok', 'szivárvány', 'csillagfény', 'kincs', 'esernyő', 'vulkán', 'vízesés', 'xilofon',
+        'sárga', 'zebra', 'táska', 'kókuszdió', 'átmérő', 'mérnök', 'tűzijáték', 'hála', 'nyaralás', 'internet',
+        'erdő', 'lovag', 'nevetés', 'rejtély', 'honvágy', 'polip', 'pingvin', 'minőség', 'melegség', 'zafír',
+        'távcső', 'sebesség', 'sípszó', 'idegengyűlölet', 'évkönyv', 'szél', 'léggömb', 'iránytű',
+        'felfedezés', 'oktatás', 'flamingó', 'aranyhal', 'harmónia', 'sziget', 'jázmin', 'tudás', 'tájkép',
+        'hegymászó', 'emlék', 'nyolcszög', 'béke', 'legenda', 'ló', 'csikóhal', 'vihar', 'utópia',
+        'röplabda', 'hurrikán', 'hentes', 'hullám', 'állatkert', 'ital', 'tisztaság', 'szitakötő',
+        'napfogyatkozás', 'jólét', 'gravitáció', 'tájfun', 'jéghegy', 'tigris', 'koala', 'leopárd', 'ásvány', 'felhő',
+        'zenekar', 'ég', 'furcsa', 'rejtvény', 'csend', 'cunami', 'univerzum', 'győzelem'
+    ],};
+
+let currentWord = "";
+let guessedLetters = [];
+let wrongGuesses = 0;
+let maxWrongGuesses = 10;
+
+// Elements
+const bullseyeCanvas = document.getElementById("bullseye");
+const context = bullseyeCanvas.getContext("2d");
+const wordDisplay = document.getElementById("wordDisplay");
+const guessSection = document.getElementById("guessSection");
+
+// Event Listeners for UI
+document.getElementById("wrongAnswersSlider").addEventListener("input", function() {
+    document.getElementById("wrongAnswersCount").innerText = this.value;
+    maxWrongGuesses = parseInt(this.value);
+});
+
+document.getElementById("players").addEventListener("change", function() {
+    if (this.value == "2") {
+        document.getElementById("twoPlayerInput").style.display = "block";
+        guessSection.style.display = "none";
+    } else {
+        document.getElementById("twoPlayerInput").style.display = "none";
+    }
+});
+
+function startGame() {
+    guessedLetters = [];
+    wrongGuesses = 0;
+    clearBullseye();
+
+    if (document.getElementById("players").value == "2") {
+        currentWord = document.getElementById("player1Word").value.toUpperCase();
+        document.getElementById("twoPlayerInput").style.display = "none"; // Hide after Player 1 submits the word
+    } else {
+        const language = document.getElementById("language").value;
+        const wordList = wordLists[language];
+        if (wordList.length > 0) {
+            currentWord = wordList[Math.floor(Math.random() * wordList.length)];
+        } else {
+            alert("No word list available for the selected language.");
+            return;
+        }
+    }
+
+    displayWord();
+    guessSection.style.display = "block";
+}
+
+function displayWord() {
+    let display = currentWord.split("").map(letter => guessedLetters.includes(letter) ? letter : "_").join(" ");
+    wordDisplay.innerText = display;
+
+    if (!display.includes("_")) {
+        alert("Congratulations! You've guessed the word!");
+        resetGame();
+    }
+}
+
+function guessLetter() {
+    const guess = document.getElementById("letterInput").value.toUpperCase();
+    document.getElementById("letterInput").value = "";
+
+    if (!guess || guessedLetters.includes(guess)) {
+        return;
+    }
+
+    guessedLetters.push(guess);
+
+    if (!currentWord.includes(guess)) {
+        wrongGuesses++;
+        drawBullseye(wrongGuesses);
+    }
+
+    if (wrongGuesses >= maxWrongGuesses) {
+        drawBullseye(maxWrongGuesses); // Final red dot
+        alert(`Game Over! The word was: ${currentWord}`);
+        resetGame();
+    } else {
+        displayWord();
+    }
+}
+
+function resetGame() {
+    guessedLetters = [];
+    wrongGuesses = 0;
+    clearBullseye();
+    guessSection.style.display = "none";
+}
+
+function clearBullseye() {
+    context.clearRect(0, 0, bullseyeCanvas.width, bullseyeCanvas.height);
+}
+
+function drawBullseye(stage) {
+    const canvasSize = bullseyeCanvas.width;
+    const colors = ["blue", "green", "yellow", "purple", "orange", "pink", "cyan", "lime", "magenta", "red"];
+    const maxRadius = canvasSize / 2 - 10; // Ensure all hoops fit
+
+    context.clearRect(0, 0, bullseyeCanvas.width, bullseyeCanvas.height);
+
+    // Calculate radius steps to fit 10 hoops
+    const radiusStep = maxRadius / maxWrongGuesses;
+
+    // Draw hoops (hollow circles) from largest to smallest
+    for (let i = 0; i < stage; i++) {
+        const radius = maxRadius - (i * radiusStep);
+        context.beginPath();
+        context.arc(bullseyeCanvas.width / 2, bullseyeCanvas.height / 2, radius, 0, Math.PI * 2);
+        context.lineWidth = 10; // Width of the hoop
+        context.strokeStyle = colors[i];
+        context.stroke();
+        context.closePath();
+    }
+
+    // Draw the red dot (final solid circle) in the center when the player loses
+    if (stage === maxWrongGuesses) {
+        context.beginPath();
+        context.arc(bullseyeCanvas.width / 2, bullseyeCanvas.height / 2, radiusStep / 2, 0, Math.PI * 2);
+        context.fillStyle = "red";
+        context.fill();
+        context.closePath();
+    }
+}
+
+</script>
+</body>
+</html>
